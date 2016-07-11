@@ -1,0 +1,20 @@
+%%%TEMPLATE
+
+Решите квадратное уравнение:
+$$%a x^2 %+b x %+c = 0$$
+
+%%%ATTRIBUTE
+
+MAX = 50
+
+%%%SOLVE
+
+(= x1 (generate -5 max))
+(= x2 (generate -5 max))
+(= a (generate 2 5))
+(= b (- (* a (+ x1 x2))))
+(= c (* a (* x1 x2)))
+
+%%%ANSWER
+
+$x_1 = %x1, x_2 = %x2$
