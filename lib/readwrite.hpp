@@ -39,6 +39,40 @@ void printEnd(FILE* fd)
     fprintf(fd, "\n\n \\end{document}");
 }
 
+const char * beautynum(const char* str)
+{
+	bool flt = false;
+	int cnt = 0;
+	if(str[0] == '"'){
+		char *new_str = new char[strlen(str) - 1];
+		for(int i = 0; i < strlen(str) - 2; ++i){
+			new_str[i] = str[i+1];
+		}
+		return new_str;
+	}
+	for(int i = 0; i < strlen(str); ++i){
+		if(str[i] == '.')
+			flt = true;
+		if(flt){
+			if(str[i] == '0')
+				++cnt;
+			else
+				cnt = 0;
+		}
+	}
+	if(cnt == 0){
+		return str;
+	}else{
+		if(str[strlen(str) - cnt - 1] == '.'){
+			--cnt;
+		}
+		char* new_str = new char[strlen(str) - cnt + 1];
+		new_str[strlen(str) - cnt] = '\0';
+		strncpy(new_str, str, strlen(str) - cnt);
+		return new_str;
+	}
+}
+
 void printVar(IntelibReader &reader, char* name, FILE* fd, int type)
 {
     reader.FeedString(name);
@@ -46,35 +80,36 @@ void printVar(IntelibReader &reader, char* name, FILE* fd, int type)
     while(!reader.IsReady()){}
     LReference ref = reader.Get();
 	ref = ref.Evaluate();
+	const char* str = beautynum(ref.TextRepresentation().GetString());
 	if(type == 0 && ref.GetInt() >= 0)
-		fprintf(fd, "+ %s", ref.TextRepresentation().GetString());
+		fprintf(fd, "+ %s", str);
 	else
-		fprintf(fd, "%s", ref.TextRepresentation().GetString());
+		fprintf(fd, "%s", str);
 }
 
 void printAnswer(IntelibReader &reader, LexList* list, FILE* fd)
 {
-	fprintf(fd, "\n \n \\begin{task} \n \n");
-    while(list != NULL){
-        if(list->leks->type == string){
-            fprintf(fd, "%s", list->leks->leks);
-        }else if (list->leks->type == sign){
-            if(list->next != NULL){
-                list = list->next;
-                if(list->leks->type == variable){
-                    printVar(reader, list->leks->leks, fd, 0);
-                }else{
-                    throw Error(wr_config);
-                }
-            }else{
-                throw Error(wr_config);
-            }
-        }else{
-            printVar(reader, list->leks->leks, fd, 1);
-        }
-        list = list -> next;
-    }
-	fprintf(fd, "\n \n \\end{task} \n \n");
+		fprintf(fd, "\n \n \\begin{task} \n \n");
+		while(list != NULL){
+				if(list->leks->type == string){
+						fprintf(fd, "%s", list->leks->leks);
+				}else if (list->leks->type == sign){
+						if(list->next != NULL){
+								list = list->next;
+								if(list->leks->type == variable){
+										printVar(reader, list->leks->leks, fd, 0);
+								}else{
+										throw Error(wr_config);
+								}
+						}else{
+								throw Error(wr_config);
+						}
+				}else{
+						printVar(reader, list->leks->leks, fd, 1);
+				}
+				list = list -> next;
+		}
+		fprintf(fd, "\n \n \\end{task} \n \n");
 }
 
 void makePdf()

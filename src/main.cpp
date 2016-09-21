@@ -1,5 +1,6 @@
-#include <string.h>
-#include <stdlib.h>
+#include <ctime>
+#include <cstring>
+#include <cstdlib>
 #include <cstdio>
 
 #include <intelib/lisp/lcont.hpp>
@@ -14,51 +15,7 @@ enum{
 #include "../lib/lexema.hpp"
 #include "../lib/table.hpp"
 #include "../lib/readwrite.hpp"
-
-class LFunctionGenerate : public SExpressionFunction {
-public:
-    LFunctionGenerate() : SExpressionFunction(2, 2){}
-    virtual SString TextRepresentation() const;
-    void DoApply(int paramsc, const SReference *paramsv, IntelibContinuation &lf) const;
-};
-
-SString LFunctionGenerate :: TextRepresentation() const
-{
-    return SString("#<FUNCTION GENERATE>");
-}
-
-void LFunctionGenerate::
-DoApply(int paramsc, const SReference paramsv[], IntelibContinuation& lf) const
-{
-    LReference res((int)
-                   (((intelib_float_t)(paramsv[1].GetInt() - paramsv[0].GetInt())
-                     *rand()/(RAND_MAX+1.0)) + paramsv[0].GetInt()));
-    lf.RegularReturn(res);
-}
-
-LExpressionPackage * MakeMyPackage(Table* table)
-{
-    LExpressionPackage *p = new LExpressionPackageIntelib;
-    LFunctionalSymbol<LFunctionPlus> s_1("+");
-    p->Import(s_1);
-    LFunctionalSymbol<LFunctionDifference> s_2("-");
-    p->Import(s_2);
-    LFunctionalSymbol<LFunctionDefvar> s_3("=");
-    p->Import(s_3);
-    LFunctionalSymbol<LFunctionTimes> s_4("*");
-    p->Import(s_4);
-    LFunctionalSymbol<LFunctionQuotient> s_5("/");
-    p->Import(s_5);
-    LFunctionalSymbol<LFunctionGenerate> s_6("GENERATE");
-    p->Import(s_6);
-    while(table != NULL){
-        LSymbol symb(table->name);
-        symb->SetDynamicValue(table->value);
-        p->Import(symb);
-        table = table->next;
-    }
-    return p;
-}
+#include "../lib/functions.hpp"
 
 LexList* makeListDirect(FILE* f_conf, int type)
 {
@@ -71,6 +28,7 @@ LexList* makeListDirect(FILE* f_conf, int type)
 
 int main(int argc, char** argv)
 {
+	srand(time(0));
 	try{
 		if (argc < 3){
 			throw Error(less_arg);
