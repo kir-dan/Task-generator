@@ -1,0 +1,45 @@
+%%%TEMPLATE
+
+Вычислите значение функции $%a x^2 %+b x %+c$ в точке $x = %x$.
+
+%%%ATTRIBUTE
+
+%%%SOLVE
+
+(= x (generatefrac 0 1 2 9))
+(= a (generatefrac -1 1 2 9))
+(= b (generatefrac -1 1 2 9))
+(= c (generatefrac -1 1 2 9))
+(= rand1 (generateint 0 2))
+(if (and (== rand1 0) (!= (mod (denumerator a) 3) 0) (!= (mod (denumerator a) 7) 0))
+	(= a (floatffrac a))
+	(= rand1 1)
+)
+(= rand2 (generateint 0 2))
+(if (and (== rand2 0) (!= (mod (denumerator b) 3) 0) (!= (mod (denumerator b) 7) 0))
+	(= b (floatffrac b))
+	(= rand2 1)
+)
+(= rand3 (generateint 0 2))
+(if (and (== rand1 1) (== rand2 1))
+	(while (not (and (!= (mod (denumerator c) 3) 0) (!= (mod (denumerator c) 7) 0)))
+		(= c (generatefrac -1 1 2 9))
+	)
+)
+(if (or (and (== rand1 1) (== rand2 1)) 
+		(and (or (== rand1 1) (== rand2 1)) (== rand3 0) 
+			(!= (mod (denumerator c) 3) 0) (!= (mod (denumerator c) 7) 0)
+		)
+	)
+	(= c (floatffrac c))
+)
+
+
+(= fx (floatffrac x))
+(= fa (floatffrac a))
+(= fb (floatffrac b))
+(= fc (floatffrac c))
+(= ans (+ fc (+ (* fa (* fa fx)) (* fb fx))))
+
+%%%ANSWER
+$%ans$

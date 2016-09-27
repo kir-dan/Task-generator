@@ -66,13 +66,15 @@ int main(int argc, char** argv)
 		for(int i = 0; i < n; ++i){
 			LexList *list_curr = list_solv;
 			while(list_curr != NULL){
-				printf("%s\n", list_curr->leks->leks);
 			    reader.FeedString(list_curr->leks->leks);
 			    reader.FeedChar('\n');
 			    while(!reader.IsReady()){}
 			    while(!reader.IsEmpty()){
+					printf("ISN READY\n");
+					while(!reader.IsReady()){}
+					printf("IS READY\n");
 			        LReference ref = reader.Get();
-					printf("%s\n", ref.TextRepresentation().GetString());
+					printf("GETTED: %s\n", ref.TextRepresentation().GetString());
 					ref = ref.Evaluate();
 			    }
 			    list_curr = list_curr->next;

@@ -102,8 +102,60 @@ SString LFunctionFloatFFrac:: TextRepresentation() const
 void LFunctionFloatFFrac::
 DoApply(int paramsc, const SReference paramsv[], IntelibContinuation& lf) const
 {
-	float f = paramsv[0].Cdr().Car().GetFloat() / paramsv[0].Cdr().Cdr().Car().GetInt();
-    lf.RegularReturn(f);
+	try{
+		float f = paramsv[0].Cdr().Car().GetFloat() / paramsv[0].Cdr().Cdr().Car().GetInt();
+		lf.RegularReturn(f);
+	}catch(...){
+		lf.RegularReturn(paramsv[0].GetFloat());
+	}
+}
+
+//NUMERATOR
+class LFunctionFracNumerator: public SExpressionFunction {
+public:
+    LFunctionFracNumerator() : SExpressionFunction(1, 1){}
+    virtual SString TextRepresentation() const;
+    void DoApply(int paramsc, const SReference *paramsv, IntelibContinuation &lf) const;
+};
+
+SString LFunctionFracNumerator:: TextRepresentation() const
+{
+    return SString("#<FUNCTION NUMERATOR>");
+}
+
+void LFunctionFracNumerator::
+DoApply(int paramsc, const SReference paramsv[], IntelibContinuation& lf) const
+{
+	try{
+		int f = paramsv[0].Cdr().Car().GetInt();
+		lf.RegularReturn(f);
+	}catch(...){
+		lf.RegularReturn(paramsv[0].GetFloat());
+	}
+}
+
+//DENUMERATOR
+class LFunctionFracDenumerator: public SExpressionFunction {
+public:
+    LFunctionFracDenumerator() : SExpressionFunction(1, 1){}
+    virtual SString TextRepresentation() const;
+    void DoApply(int paramsc, const SReference *paramsv, IntelibContinuation &lf) const;
+};
+
+SString LFunctionFracDenumerator:: TextRepresentation() const
+{
+    return SString("#<FUNCTION DENUMERATOR>");
+}
+
+void LFunctionFracDenumerator::
+DoApply(int paramsc, const SReference paramsv[], IntelibContinuation& lf) const
+{
+	try{
+		int f = paramsv[0].Cdr().Cdr().Car().GetInt();
+		lf.RegularReturn(f);
+	}catch(...){
+		lf.RegularReturn(paramsv[0].GetFloat());
+	}
 }
 
 LExpressionPackage * MakeMyPackage(Table* table)
@@ -125,8 +177,36 @@ LExpressionPackage * MakeMyPackage(Table* table)
     p->Import(s_7);
     LFunctionalSymbol<LFunctionGenerateFrac> s_8("GENERATEFRAC");
     p->Import(s_8);
-    LFunctionalSymbol<LFunctionFloatFFrac> s_9("FLOATFFRUC");
+    LFunctionalSymbol<LFunctionFloatFFrac> s_9("FLOATFFRAC");
     p->Import(s_9);
+    LFunctionalSymbol<LFunctionIf> s_10("IF");
+    p->Import(s_10);
+    LFunctionalSymbol<LFunctionMathequal> s_11("==");
+    p->Import(s_11);
+    LFunctionalSymbol<LFunctionMathnotequal> s_12("!=");
+    p->Import(s_12);
+    LFunctionalSymbol<LFunctionMathgeq> s_13(">=");
+    p->Import(s_13);
+    LFunctionalSymbol<LFunctionMathleq> s_14("<=");
+    p->Import(s_14);
+    LFunctionalSymbol<LFunctionLessp> s_15("<");
+    p->Import(s_15);
+    LFunctionalSymbol<LFunctionGreaterp> s_16(">");
+    p->Import(s_16);
+	LFunctionalSymbol<SFunctionAnd> s_17("AND");
+	p->Import(s_17);
+	LFunctionalSymbol<SFunctionOr> s_18("OR");
+	p->Import(s_18);
+	LFunctionalSymbol<LFunctionWhile> s_19("WHILE");
+	p->Import(s_19);
+	LFunctionalSymbol<LFunctionFracNumerator> s_20("NUMERATOR");
+	p->Import(s_20);
+	LFunctionalSymbol<LFunctionFracDenumerator> s_21("DENUMERATOR");
+	p->Import(s_21);
+	LFunctionalSymbol<LFunctionMod> s_22("MOD");
+	p->Import(s_22);
+	LFunctionalSymbol<LFunctionNot> s_23("NOT");
+	p->Import(s_23);
     while(table != NULL){
         LSymbol symb(table->name);
         symb->SetDynamicValue(table->value);

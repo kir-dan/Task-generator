@@ -104,7 +104,7 @@ void printVar(IntelibReader &reader, char* name, FILE* fd, int type)
 	printf("END_STR: %s\n END\n", str);
 	bool init = false;
 	try{
-		init = ref.GetInt() >= 0;
+		init = ref.GetFloat() >= 0;
 	}catch(...){
 		if(str[0] == '-')
 			init = false;
