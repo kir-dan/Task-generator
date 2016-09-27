@@ -73,15 +73,37 @@ DoApply(int paramsc, const SReference paramsv[], IntelibContinuation& lf) const
         *rand()/(RAND_MAX+1.0)) + paramsv[2].GetInt();
 	int n = 0;
 	while(1){
-		n = ((intelib_float_t)(paramsv[3].GetInt() - 1)
-		    *rand()/(RAND_MAX+1.0)) + 1;
-		if(((float)n / m > paramsv[0].GetFloat()) && ((float)n / m < paramsv[1].GetFloat()))	
+		n = ((intelib_float_t)(paramsv[3].GetInt()*2)
+		    *rand()/(RAND_MAX+1.0)) - paramsv[3].GetInt();
+		if((n != 0) && ((float)n / m > paramsv[0].GetFloat())
+			&& ((float)n / m < paramsv[1].GetFloat()))	
 			break;
 	}
-	char * re;
-	sprintf(re, "%d/%d", n, m);
-	LReference res(re);
-    lf.RegularReturn(res);
+	LListConstructor L;
+	LFunctionalSymbol<LFunctionQuotient> fq("/");
+	LReference re = (L| fq, n, m);
+//	float res = re.Evaluate().GetFloat();
+    lf.RegularReturn(re);
+}
+
+//MAKEFLOATFROMFRAC
+class LFunctionFloatFFrac: public SExpressionFunction {
+public:
+    LFunctionFloatFFrac() : SExpressionFunction(1, 1){}
+    virtual SString TextRepresentation() const;
+    void DoApply(int paramsc, const SReference *paramsv, IntelibContinuation &lf) const;
+};
+
+SString LFunctionFloatFFrac:: TextRepresentation() const
+{
+    return SString("#<FUNCTION FLOATFROMFRAC>");
+}
+
+void LFunctionFloatFFrac::
+DoApply(int paramsc, const SReference paramsv[], IntelibContinuation& lf) const
+{
+	float f = paramsv[0].Cdr().Car().GetFloat() / paramsv[0].Cdr().Cdr().Car().GetInt();
+    lf.RegularReturn(f);
 }
 
 LExpressionPackage * MakeMyPackage(Table* table)
@@ -103,6 +125,8 @@ LExpressionPackage * MakeMyPackage(Table* table)
     p->Import(s_7);
     LFunctionalSymbol<LFunctionGenerateFrac> s_8("GENERATEFRAC");
     p->Import(s_8);
+    LFunctionalSymbol<LFunctionFloatFFrac> s_9("FLOATFFRUC");
+    p->Import(s_9);
     while(table != NULL){
         LSymbol symb(table->name);
         symb->SetDynamicValue(table->value);
