@@ -1,0 +1,31 @@
+%%%TEMPLATE
+
+Вычислите значение функции $\frac{x^2 %+a}{x %+b}$ в точке $x = %x$.
+%%%ATTRIBUTE
+
+%%%SOLVE
+
+(= x (generatefrac -2 2 2 9))
+(= rand (generateint 0 2))
+(if (== rand 0)
+	(= a (generateint -10 10 '(0 1 -1)))
+	(= a (generatefrac -2 2 2 9 '() '(3 6 7)))
+)
+(if (== rand 1)
+	(= b (generateint -10 10 '(0 1 -1)))
+	(= b (generatefrac -2 2 2 9 '() '(3 6 7)))
+)
+
+(= fx (floatffrac x))
+
+(if (== rand 1)
+	(= a (floatffrac a))
+	(= b (floatffrac b))
+)
+(= fa (floatffrac a))
+(= fb (floatffrac b))
+
+(= ans (/ (+ (* fx fx) fa) (+ fx fb)))
+
+%%%ANSWER
+$%ans$

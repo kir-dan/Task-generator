@@ -63,6 +63,7 @@ int main(int argc, char** argv)
 		IntelibReader reader;
 		LReference package(MakeMyPackage(table));
 		reader.SetPackage(static_cast<LExpressionPackage*>(package.GetPtr()));
+		reader.AddQuoter("'", &QuoteExpression);
 		for(int i = 0; i < n; ++i){
 			LexList *list_curr = list_solv;
 			while(list_curr != NULL){

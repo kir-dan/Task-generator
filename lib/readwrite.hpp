@@ -83,7 +83,7 @@ const char * beautynum(IntelibReader &reader, const char* str)
 		return str;
 	}else{
 		if(str[strlen(str) - cnt - 1] == '.'){
-			--cnt;
+			++cnt;
 		}
 		char* new_str = new char[strlen(str) - cnt + 1];
 		new_str[strlen(str) - cnt] = '\0';
