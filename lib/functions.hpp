@@ -29,49 +29,59 @@ int GenInt(int a, int b)
 	return (int)(((intelib_float_t)(b - a)*rand()/(RAND_MAX+1.0)) + a);
 }
 
-float GenFloat(float a, float b, float n)
+float GenFloat(float a, float b, int min, int max)
 {
-	float r = ((intelib_float_t)(b - a)*rand()/(RAND_MAX+1.0)) + a;
+	float r;
+	int n = Pow(10, max);
+	r = ((intelib_float_t)(b - a)*rand()/(RAND_MAX+1.0)) + a;
 	r -= (r * n - (int)(r * n)) / n;
-	return r;
-}
-
-int GenIntWithConfine(LReference lx, int r, int a, int b)
-{
-	while(1){
-		LReference x = lx;
-		while(!x.IsEmptyList()){
-			int m = x.Car().GetInt();
-			if(m == r){
-				printf("НЕ ПРОШЕЛ ПРОВЕРКУ: m = %d, r = %d\n", r, m);
-				break;
-			}
-			printf("ПРОШЕЛ ПРОВЕРКУ: m = %d, r = %d\n", r, m);
-			x = x.Cdr();
-		}
-		if(x.IsEmptyList())
-			break;
-		r = GenInt(a, b);
+	if(min == 0){
+		return r;	
+	}
+	int m = Pow(10, (max - min + 1));
+	while((int)(r * n) % m == 0){
+		r = ((intelib_float_t)(b - a)*rand()/(RAND_MAX+1.0)) + a;
+		r -= (r * n - (int)(r * n)) / n;
 	}
 	return r;
 }
 
-float GenFloatWithConfine(LReference lx, float r, float a, float b, float n)
+int GenIntWithConfine(LReference lx, int a, int b)
 {
-		while(1){
-			LReference x = lx;
-			while(!x.IsEmptyList()){
-				float m = x.Car().GetFloat();
-				if(Abs(m - r) < 0.0000001){
-					break;
-				}
-				x = x.Cdr();
-			}
-			if(x.IsEmptyList())
+	int r;
+	do{
+		r = GenInt(a, b);
+		LReference x = lx;
+		while(!x.IsEmptyList()){
+			int m = x.Car().GetInt();
+			if(m == r){
 				break;
-			r = GenFloat(a, b, n);
+			}
+			x = x.Cdr();
 		}
-		return r;
+		if(x.IsEmptyList())
+			break;
+	}while(1);
+	return r;
+}
+
+float GenFloatWithConfine(LReference lx, float a, float b, int min, int max)
+{
+	float r;
+	do{
+		r = GenFloat(a, b, min, max);
+		LReference x = lx;
+		while(!x.IsEmptyList()){
+			float m = x.Car().GetFloat();
+			if(Abs(m - r) < 0.0000001){
+				break;
+			}
+			x = x.Cdr();
+		}
+		if(x.IsEmptyList())
+			break;
+	}while(1);
+	return r;
 }
 
 bool CheckNM(int n, int m, float a, float b)
@@ -103,18 +113,20 @@ SString LFunctionGenerateInt :: TextRepresentation() const
 void LFunctionGenerateInt::
 DoApply(int paramsc, const SReference paramsv[], IntelibContinuation& lf) const
 {
-	int r = GenInt(paramsv[0].GetInt(), paramsv[1].GetInt());
+	int r;
 	if(paramsc > 2){
-		r = GenIntWithConfine(paramsv[2], r, paramsv[0].GetInt(), paramsv[1].GetInt());
+		r = GenIntWithConfine(paramsv[2], paramsv[0].GetInt(), paramsv[1].GetInt());
+	}else{
+		r = GenInt(paramsv[0].GetInt(), paramsv[1].GetInt());
 	}
 	LReference res(r);
     lf.RegularReturn(res);
 }
 
-//GENERATEFLOAT
+//GENERATEFLOAT(MIN, MAX, MAX_C_ZN/[MIN_C_ZN, MAX_C_ZN, EXCEPTION])
 class LFunctionGenerateFloat: public SExpressionFunction {
 public:
-    LFunctionGenerateFloat() : SExpressionFunction(3, 4){}
+    LFunctionGenerateFloat() : SExpressionFunction(3, 5){}
     virtual SString TextRepresentation() const;
     void DoApply(int paramsc, const SReference *paramsv, IntelibContinuation &lf) const;
 };
@@ -127,10 +139,26 @@ SString LFunctionGenerateFloat:: TextRepresentation() const
 void LFunctionGenerateFloat::
 DoApply(int paramsc, const SReference paramsv[], IntelibContinuation& lf) const
 {
-	int n = Pow(10, paramsv[2].GetInt());
-	float r = GenFloat(paramsv[0].GetFloat(), paramsv[1].GetFloat(), n);
-	if(paramsc > 3){
-		r = GenFloatWithConfine(paramsv[3], r, paramsv[0].GetInt(), paramsv[1].GetInt(), n);
+	int mx, mn;
+	float r;
+	switch(paramsc){
+	case 3:
+		mx = paramsv[2].GetInt();
+		r = GenFloat(paramsv[0].GetFloat(), paramsv[1].GetFloat(), 0, mx);
+		break;
+	case 4:
+		mn = paramsv[2].GetInt();
+		mx = paramsv[3].GetInt();
+		r = GenFloat(paramsv[0].GetFloat(), paramsv[1].GetFloat(), mn, mx);
+		break;
+	case 5:
+		mn = paramsv[2].GetInt();
+		mx = paramsv[3].GetInt();
+		r = GenFloatWithConfine(paramsv[4], paramsv[0].GetFloat(),
+			paramsv[1].GetFloat(), mn, mx);
+		break;
+	default: 
+		break;
 	}
     LReference res(r);
     lf.RegularReturn(res);
@@ -152,29 +180,29 @@ SString LFunctionGenerateFrac:: TextRepresentation() const
 void LFunctionGenerateFrac::
 DoApply(int paramsc, const SReference paramsv[], IntelibContinuation& lf) const
 {
-	int m = GenInt(paramsv[2].GetInt(), paramsv[3].GetInt());
+	int m;
 	if(paramsc > 5){
-		m = GenIntWithConfine(paramsv[5], m, paramsv[2].GetInt(), paramsv[3].GetInt()); 
+		m = GenIntWithConfine(paramsv[5], paramsv[2].GetInt(), paramsv[3].GetInt());
+	}else{
+		m = GenInt(paramsv[2].GetInt(), paramsv[3].GetInt());
 	}
-	int n = 0;
 	int a = - paramsv[3].GetInt()*paramsv[2].GetInt();
 	int b = paramsv[3].GetInt()*paramsv[2].GetInt();
-	while(1){
-		n = GenInt(a, b);
-		if(CheckNM(n, m, paramsv[0].GetFloat(), paramsv[1].GetFloat())){
-			if(paramsc > 4){
-				while(1){
-					n = GenIntWithConfine(paramsv[4], n, a, b);
-					if(CheckNM(n, m, paramsv[0].GetFloat(), paramsv[1].GetFloat()))
-						break;
-					else
-						n = GenInt(a, b);
-				}
-			}
-			break;
+	int n = GenInt(a, b);
+	if(paramsc > 4){
+		while(1){
+			n = GenIntWithConfine(paramsv[4], a, b);
+			if(CheckNM(n, m, paramsv[0].GetFloat(), paramsv[1].GetFloat()))
+				break;
+		}
+	}else{
+		while(1){
+			if(CheckNM(n, m, paramsv[0].GetFloat(), paramsv[1].GetFloat()))
+				break;
+			else
+				n = GenInt(a, b);
 		}
 	}
-
 	LListConstructor L;
 	LFunctionalSymbol<LFunctionQuotient> fq("/");
 	LReference re = (L| fq, n, m);

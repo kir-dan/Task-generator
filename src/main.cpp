@@ -71,11 +71,8 @@ int main(int argc, char** argv)
 			    reader.FeedChar('\n');
 			    while(!reader.IsReady()){}
 			    while(!reader.IsEmpty()){
-					printf("ISN READY\n");
 					while(!reader.IsReady()){}
-					printf("IS READY\n");
 			        LReference ref = reader.Get();
-					printf("GETTED: %s\n", ref.TextRepresentation().GetString());
 					ref = ref.Evaluate();
 			    }
 			    list_curr = list_curr->next;
@@ -92,11 +89,8 @@ int main(int argc, char** argv)
 		printEnd(f_var);
 		printEnd(f_ans);
 		fclose(f_var);
-		printf("f_var closed\n");
 		fclose(f_ans);
-		printf("f_ans closed\n");
 		fclose(f_config);
-		printf("f_config closed\n");
 
 		//make pdf
 		makePdf();

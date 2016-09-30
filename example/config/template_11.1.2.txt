@@ -9,23 +9,16 @@
 (= rand (generateint 0 2))
 (if (== rand 0)
 	(= a (generateint -10 10 '(0 1 -1)))
-	(= a (generatefrac -2 2 2 9 '() '(3 6 7)))
+	(= a (generatefloat -2 2 1 3))
 )
 (if (== rand 1)
 	(= b (generateint -10 10 '(0 1 -1)))
-	(= b (generatefrac -2 2 2 9 '() '(3 6 7)))
+	(= b (generatefloat -2 2 1 3))
 )
 
 (= fx (floatffrac x))
 
-(if (== rand 1)
-	(= a (floatffrac a))
-	(= b (floatffrac b))
-)
-(= fa (floatffrac a))
-(= fb (floatffrac b))
-
-(= ans (/ (+ (* fx fx) fa) (+ fx fb)))
+(= ans (/ (+ (* fx fx) a) (+ fx b)))
 
 %%%ANSWER
 $%ans$
