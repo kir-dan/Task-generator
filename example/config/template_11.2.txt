@@ -1,0 +1,19 @@
+%%%TEMPLATE
+
+Решите уравнение $(\sin(x) %+k \cos(x))^2 = %a$
+
+%%%ATTRIBUTE
+
+%%%SOLVE
+
+(= a (generateint 1 3))
+(= k (generateint -1 2 '(0)))
+(= arc (- a 1))
+(if (< k 0) 
+	(= arc (- arc))
+)
+(= ans (asin arc))
+(= ans (/ ans 2))
+
+%%%ANSWER
+$%ans$

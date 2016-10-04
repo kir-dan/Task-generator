@@ -26,7 +26,10 @@ float Abs(float a)
 
 int GenInt(int a, int b)
 {
-	return (int)(((intelib_float_t)(b - a)*rand()/(RAND_MAX+1.0)) + a);
+	if(a >= 0)
+		return (int)(((intelib_float_t)(b - a)*rand()/(RAND_MAX+1.0)) + a);
+	else
+		return (int)(((intelib_float_t)(b - a + 1)*rand()/(RAND_MAX+1.0)) + a - 1);
 }
 
 float GenFloat(float a, float b, int min, int max)
@@ -331,6 +334,26 @@ LExpressionPackage * MakeMyPackage(Table* table)
 	p->Import(s_22);
 	LFunctionalSymbol<LFunctionNot> s_23("NOT");
 	p->Import(s_23);
+    LFunctionalSymbol<SFunctionAcos> s_24("ACOS");
+    p->Import(s_24);
+    LFunctionalSymbol<SFunctionAsin> s_25("ASIN");
+    p->Import(s_25);
+    LFunctionalSymbol<SFunctionAtan> s_26("ATAN");
+    p->Import(s_26);
+    LFunctionalSymbol<SFunctionCos> s_27("COS");
+    p->Import(s_27);
+    LFunctionalSymbol<SFunctionExp> s_28("EXP");
+    p->Import(s_28);
+    LFunctionalSymbol<SFunctionExpt> s_29("EXPT");
+    p->Import(s_29);
+	LFunctionalSymbol<SFunctionLog> s_30("LOG");
+    p->Import(s_30);
+    LFunctionalSymbol<SFunctionSin> s_31("SIN");
+    p->Import(s_31);
+    LFunctionalSymbol<SFunctionSqrt> s_32("SQRT");
+    p->Import(s_32);
+    LFunctionalSymbol<SFunctionTan> s_33("TAN");
+    p->Import(s_33);
     while(table != NULL){
         LSymbol symb(table->name);
         symb->SetDynamicValue(table->value);

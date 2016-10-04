@@ -6,6 +6,7 @@
 #include <intelib/lisp/lcont.hpp>
 #include <intelib/lisp/lpackage.hpp>
 #include <intelib/lfun_std.hpp>
+#include <intelib/lfun_m.hpp>
 
 enum{
 	templ, attr, solv
@@ -71,7 +72,6 @@ int main(int argc, char** argv)
 			    reader.FeedChar('\n');
 			    while(!reader.IsReady()){}
 			    while(!reader.IsEmpty()){
-					while(!reader.IsReady()){}
 			        LReference ref = reader.Get();
 					ref = ref.Evaluate();
 			    }
