@@ -1,3 +1,4 @@
+//конкатенация строк
 const char* stradd(const char* left, const char* right)
 {
 	char * conc = new char[strlen(left) + strlen(right) + 1];
@@ -6,6 +7,7 @@ const char* stradd(const char* left, const char* right)
 	return conc;
 }
 
+//открытие файла конфигурации для чтения
 FILE * openReadFile(char* name)
 {
 	FILE * fd = fopen(name, "r");
@@ -15,6 +17,8 @@ FILE * openReadFile(char* name)
 	return fd;
 }
 
+//открытие файла для записи
+//TODO дописать тут комментарий
 FILE * openWriteFile(int argc, char** argv, const char *def)
 {
 	FILE * fd;
@@ -29,16 +33,20 @@ FILE * openWriteFile(int argc, char** argv, const char *def)
 	return fd;
 }
 
+//печать начала файла
 void printBegin(FILE* fd)
 {
     fprintf(fd, "%s", file_begin);
 }
 
+//печать конца файла
 void printEnd(FILE* fd)
 {
     fprintf(fd, "\n\n \\end{document}");
 }
 
+//красивый вывод для чисел
+//TODO написать как работает и уменьшить код
 const char * beautynum(IntelibReader &reader, const char* str)
 {
 	bool flt = false;
@@ -89,6 +97,9 @@ const char * beautynum(IntelibReader &reader, const char* str)
 	}
 }
 
+//печать переменной в файл
+//(reader, имя переменной, файл печати, тип: 0 -- со знаком, 1 -- без знака
+//TODO заменить ставнение на Epsilon
 void printVar(IntelibReader &reader, char* name, FILE* fd, int type)
 {
     reader.FeedString(name);
@@ -113,6 +124,7 @@ void printVar(IntelibReader &reader, char* name, FILE* fd, int type)
 	}
 }
 
+//печать ответа
 void printAnswer(IntelibReader &reader, LexList* list, FILE* fd)
 {
 		fprintf(fd, "\n \n \\begin{task} \n \n");

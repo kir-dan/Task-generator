@@ -1,3 +1,4 @@
+//степень
 int Pow(int a, int b)
 {
 	int s = 1;
@@ -8,6 +9,7 @@ int Pow(int a, int b)
 	return s;
 }
 
+//модуль -- целые числа
 int Abs(int a)
 {
 	if(a >= 0)
@@ -16,6 +18,8 @@ int Abs(int a)
 		return -a;
 }
 
+//модуль -- вещенстенные числа
+//TODO сделать сравнение по Epsilon
 float Abs(float a)
 {
 	if(a >= 0)
@@ -24,6 +28,7 @@ float Abs(float a)
 		return -a;
 }
 
+//генерация рандомного целого числа
 int GenInt(int a, int b)
 {
 	if(a >= 0)
@@ -32,6 +37,8 @@ int GenInt(int a, int b)
 		return (int)(((intelib_float_t)(b - a + 1)*rand()/(RAND_MAX+1.0)) + a - 1);
 }
 
+//генерация рандомного вещественного числа с заданным количеством цифр после запятой
+//TODO пересмотреть идею генерации
 float GenFloat(float a, float b, int min, int max)
 {
 	float r;
@@ -49,6 +56,8 @@ float GenFloat(float a, float b, int min, int max)
 	return r;
 }
 
+//генерация целого с ограничениями по списку
+//TODO сделать генерацию с ограничениями по функции
 int GenIntWithConfine(LReference lx, int a, int b)
 {
 	int r;
@@ -68,6 +77,8 @@ int GenIntWithConfine(LReference lx, int a, int b)
 	return r;
 }
 
+//генерация вещественного с ограничениями по списку
+//TODO сделать генерацию с ограничениями по функции
 float GenFloatWithConfine(LReference lx, float a, float b, int min, int max)
 {
 	float r;
@@ -87,6 +98,8 @@ float GenFloatWithConfine(LReference lx, float a, float b, int min, int max)
 	return r;
 }
 
+//проверка двух чисел на то, что они могут являться рациональной дробью
+//TODO добавить проверку на деление m на n, чтобы дроби не сокращались
 bool CheckNM(int n, int m, float a, float b)
 {
 	float fn = n;
@@ -94,13 +107,14 @@ bool CheckNM(int n, int m, float a, float b)
 	return (n != 0) && (Abs(n) % Abs(m) != 0) && (fn / fm > a) && (fn / fm < b);
 }
 
-
+//вычисление выражение с кавычкой
 static SReference QuoteExpression(const SReference &ref, void *m)
 {
     return ~(LReference(ref));
 }
 
-//GENERATEINT
+//генерация целого значение
+//generateint(min, max, confines)
 class LFunctionGenerateInt : public SExpressionFunction {
 public:
     LFunctionGenerateInt() : SExpressionFunction(2, 3){}
@@ -126,6 +140,7 @@ DoApply(int paramsc, const SReference paramsv[], IntelibContinuation& lf) const
     lf.RegularReturn(res);
 }
 
+//генерация вещественного значенияс определенным количеством знаков после запятой
 //GENERATEFLOAT(MIN, MAX, MAX_C_ZN/[MIN_C_ZN, MAX_C_ZN, EXCEPTION])
 class LFunctionGenerateFloat: public SExpressionFunction {
 public:
@@ -167,6 +182,7 @@ DoApply(int paramsc, const SReference paramsv[], IntelibContinuation& lf) const
     lf.RegularReturn(res);
 }
 
+//генерация дроби
 //GENERATFRAC(MIN, MAX, MIN_ZNAM, MAX_ZNAM)
 class LFunctionGenerateFrac: public SExpressionFunction {
 public:
@@ -180,6 +196,7 @@ SString LFunctionGenerateFrac:: TextRepresentation() const
     return SString("#<FUNCTION GENERATEFRAC>");
 }
 
+//TODO Evaluate надо заменить: TailReturn или типа того
 void LFunctionGenerateFrac::
 DoApply(int paramsc, const SReference paramsv[], IntelibContinuation& lf) const
 {
@@ -213,6 +230,7 @@ DoApply(int paramsc, const SReference paramsv[], IntelibContinuation& lf) const
     lf.RegularReturn(re);
 }
 
+//Вычисляем из дроби вещественное число
 //MAKEFLOATFROMFRAC
 class LFunctionFloatFFrac: public SExpressionFunction {
 public:
@@ -237,6 +255,7 @@ DoApply(int paramsc, const SReference paramsv[], IntelibContinuation& lf) const
 	}
 }
 
+//выделение числителя из дроби
 //NUMERATOR
 class LFunctionFracNumerator: public SExpressionFunction {
 public:
@@ -261,6 +280,7 @@ DoApply(int paramsc, const SReference paramsv[], IntelibContinuation& lf) const
 	}
 }
 
+//выделение знаменателя из дроби
 //DENUMERATOR
 class LFunctionFracDenumerator: public SExpressionFunction {
 public:
