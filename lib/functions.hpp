@@ -30,13 +30,22 @@ float Abs(float a)
 		return -a;
 }
 
+//генерация случайного числа
+float GenSmth(float a, float b, int type = 0)
+{
+    if(type){
+        return (b - a + 1)*rand()/(RAND_MAX+1.0) + a - 1;
+    }
+    return (b - a)*rand()/(RAND_MAX+1.0) + a;
+}
+
 //генерация рандомного целого числа
 int GenInt(int a, int b)
 {
 	if(a >= 0)
-		return (int)(((intelib_float_t)(b - a)*rand()/(RAND_MAX+1.0)) + a);
+		return (int)(GenSmth(a, b));
 	else
-		return (int)(((intelib_float_t)(b - a + 1)*rand()/(RAND_MAX+1.0)) + a - 1);
+		return (int)(GenSmth(a, b, 1));
 }
 
 //генерация рандомного вещественного числа с заданным количеством цифр после запятой
@@ -45,14 +54,14 @@ float GenFloat(float a, float b, int min, int max)
 {
 	float r;
 	int n = Pow(10, max);
-	r = ((intelib_float_t)(b - a)*rand()/(RAND_MAX+1.0)) + a;
+	r = GenSmth(a, b);
 	r -= (r * n - (int)(r * n)) / n;
 	if(min == 0){
 		return r;	
 	}
 	int m = Pow(10, (max - min + 1));
 	while((int)(r * n) % m == 0){
-		r = ((intelib_float_t)(b - a)*rand()/(RAND_MAX+1.0)) + a;
+		r = GenSmth(a, b);
 		r -= (r * n - (int)(r * n)) / n;
 	}
 	return r;
@@ -89,7 +98,7 @@ float GenFloatWithConfine(LReference lx, float a, float b, int min, int max)
 		LReference x = lx;
 		while(!x.IsEmptyList()){
 			float m = x.Car().GetFloat();
-			if(Abs(m - r) < 0.0000001){
+			if(Abs(m - r) < EPSILON){
 				break;
 			}
 			x = x.Cdr();
