@@ -49,10 +49,13 @@ int GenInt(int a, int b)
 }
 
 //генерация рандомного вещественного числа с заданным количеством цифр после запятой
-//TODO пересмотреть идею генерации
-float GenFloat(float a, float b, int min, int max)
+float GenFloat(float a, float b, int min = 0, int max = 0)
 {
 	float r;
+	if (!max) {
+	    max = min;
+	    min = 0;
+	}
 	int n = Pow(10, max);
     int m = Pow(10, max - min + 1);
 	do{
