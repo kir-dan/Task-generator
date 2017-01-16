@@ -99,7 +99,6 @@ const char * beautynum(IntelibReader &reader, const char* str)
 
 //печать переменной в файл
 //(reader, имя переменной, файл печати, тип: 0 -- со знаком, 1 -- без знака
-//TODO заменить ставнение на Epsilon
 void printVar(IntelibReader &reader, char* name, FILE* fd, int type)
 {
     reader.FeedString(name);
