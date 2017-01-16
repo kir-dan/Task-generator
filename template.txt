@@ -6,6 +6,7 @@
 
 %%%SOLVE
 
+(= m (generatefloat -1 1 3))
 (= x1 (generatefrac -1 1 2 8))
 (= ans (generatefrac -1 1 2 8))
 (= a (denumerator ans))
@@ -15,4 +16,6 @@
 (= x22 (* a (numerator x1)))
 
 %%%ANSWER
+%m
+
 $\frac{%x21}{%x22}$

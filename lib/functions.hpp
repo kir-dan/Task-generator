@@ -54,16 +54,11 @@ float GenFloat(float a, float b, int min, int max)
 {
 	float r;
 	int n = Pow(10, max);
-	r = GenSmth(a, b);
-	r -= (r * n - (int)(r * n)) / n;
-	if(min == 0){
-		return r;	
-	}
-	int m = Pow(10, (max - min + 1));
-	while((int)(r * n) % m == 0){
-		r = GenSmth(a, b);
-		r -= (r * n - (int)(r * n)) / n;
-	}
+    int m = Pow(10, max - min + 1);
+	do{
+	    r = GenSmth(a, b);
+        r -= (r * n - (int)(r * n)) / n;
+	}while((int)(r * n) % m == 0);
 	return r;
 }
 
@@ -176,7 +171,7 @@ DoApply(int paramsc, const SReference paramsv[], IntelibContinuation& lf) const
 	switch(paramsc){
 	case 3:
 		mx = paramsv[2].GetInt();
-		r = GenFloat(paramsv[0].GetFloat(), paramsv[1].GetFloat(), 0, mx);
+		r = GenFloat(paramsv[0].GetFloat(), paramsv[1].GetFloat(), mx, mx);
 		break;
 	case 4:
 		mn = paramsv[2].GetInt();
