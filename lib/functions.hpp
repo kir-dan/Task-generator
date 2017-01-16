@@ -1,4 +1,4 @@
-#define EPSILON = 0.000000000000001
+#define EPSILON 0.000000000000001
 
 //TODO проверить все функции генерации
 //степень
@@ -24,7 +24,7 @@ int Abs(int a)
 //модуль -- вещенстенные числа
 float Abs(float a)
 {
-	if(a >= EPSILON)
+	if(a >= 0)
 		return a;
 	else
 		return -a;
@@ -34,9 +34,9 @@ float Abs(float a)
 int GenInt(int a, int b)
 {
 	if(a >= 0)
-		return (int)(((b - a)*rand()/(RAND_MAX+1.0)) + a);
+		return (int)(((intelib_float_t)(b - a)*rand()/(RAND_MAX+1.0)) + a);
 	else
-		return (int)(((b - a + 1)*rand()/(RAND_MAX+1.0)) + a - 1);
+		return (int)(((intelib_float_t)(b - a + 1)*rand()/(RAND_MAX+1.0)) + a - 1);
 }
 
 //генерация рандомного вещественного числа с заданным количеством цифр после запятой
@@ -108,8 +108,8 @@ bool CheckNM(int n, int m, float a, float b)
 	float fm = m;
 	return (n != 0) &&
 	    (Abs(n) % Abs(m) != 0) &&
-	    ((fn / fm - a) > EPSILON) &&
-	    ((fn / fm - b) < EPSILON);
+	    (fn / fm - a > EPSILON) &&
+	    (fn / fm - b < EPSILON);
 }
 
 //вычисление выражение с кавычкой
