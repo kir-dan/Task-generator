@@ -1,0 +1,18 @@
+%%%TEMPLATE
+
+Старший коэффициент квадратного трехчлена $f(x)$ равен $%a$. Один из его корней равен $%x1$. Найдите второй корень, если известно, что $f(0)=%c$.
+
+%%%ATTRIBUTE
+
+%%%SOLVE
+
+(= x1 (generatefrac -1 1 2 8))
+(= ans (generatefrac -1 1 2 8))
+(= a (denumerator ans))
+(= c (numerator ans))
+
+(= x21 (* c (denumerator x1)))
+(= x22 (* a (numerator x1)))
+
+%%%ANSWER
+$\frac{%x21}{%x22}$
