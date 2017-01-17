@@ -16,6 +16,6 @@
 (= x22 (* a (numerator x1)))
 
 %%%ANSWER
-%x1
+$%x1$
 
 $\frac{%x21}{%x22}$
