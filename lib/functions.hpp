@@ -54,7 +54,7 @@ float GenFloat(float a, float b, int min = 0, int max = 0)
 	float r;
 	if (!max) {
 	    max = min;
-	    min = 0;
+	    min = max;
 	}
 	int n = Pow(10, max);
     int m = Pow(10, max - min + 1);
