@@ -107,13 +107,12 @@ float GenFloatWithConfine(LReference lx, float a, float b, int min, int max)
 }
 
 //проверка двух чисел на то, что они могут являться рациональной дробью
-//TODO добавить проверку на деление m на n, чтобы дроби не сокращались
 bool CheckNM(int n, int m, float a, float b)
 {
-	float fn = n;
-	float fm = m;
+	float fn = n, fm = m;
+	int mn = Abs(n), mm = Abs(m);
 	return (n != 0) &&
-	    (Abs(n) % Abs(m) != 0) &&
+	    (((mn > mm) && (mm % mn != 0)) || ((mm > mn) && (mn % mm != 0))) &&
 	    (fn / fm - a > EPSILON) &&
 	    (fn / fm - b < EPSILON);
 }
