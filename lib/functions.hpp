@@ -168,22 +168,21 @@ void LFunctionGenerateFloat::
 DoApply(int paramsc, const SReference paramsv[], IntelibContinuation& lf) const
 {
 	int mx, mn;
-	float r;
+	float r, a = paramsv[0].GetFloat(), b = paramsv[1].GetFloat();
 	switch(paramsc){
 	case 3:
 		mx = paramsv[2].GetInt();
-		r = GenFloat(paramsv[0].GetFloat(), paramsv[1].GetFloat(), mx, mx);
+		r = GenFloat(a, b, mx);
 		break;
 	case 4:
 		mn = paramsv[2].GetInt();
 		mx = paramsv[3].GetInt();
-		r = GenFloat(paramsv[0].GetFloat(), paramsv[1].GetFloat(), mn, mx);
+		r = GenFloat(a, b, mn, mx);
 		break;
 	case 5:
 		mn = paramsv[2].GetInt();
 		mx = paramsv[3].GetInt();
-		r = GenFloatWithConfine(paramsv[4], paramsv[0].GetFloat(),
-			paramsv[1].GetFloat(), mn, mx);
+		r = GenFloatWithConfine(paramsv[4], a, b, mn, mx);
 		break;
 	default: 
 		break;

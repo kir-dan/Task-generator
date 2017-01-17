@@ -6,7 +6,7 @@
 
 %%%SOLVE
 
-(= m (generatefloat -1 1 2 3 '(0.55)))
+(= m (generatefloat -1 1 1 5))
 (= x1 (generatefrac -1 1 2 8))
 (= ans (generatefrac -1 1 2 8))
 (= a (denumerator ans))
@@ -17,4 +17,4 @@
 (= x22 (* a (numerator x1)))
 
 %%%ANSWER
-$%x1$
+$%m$
