@@ -49,6 +49,7 @@ int GenInt(int a, int b)
 }
 
 //генерация рандомного вещественного числа с заданным количеством цифр после запятой
+//TODO проверить ограничения генерации
 float GenFloat(float a, float b, int min = 0, int max = 0)
 {
 	float r;
@@ -89,20 +90,19 @@ int GenIntWithConfine(LReference lx, int a, int b)
 //TODO сделать генерацию с ограничениями по функции
 float GenFloatWithConfine(LReference lx, float a, float b, int min, int max)
 {
-	float r;
+	float r, m;
+	LReference x;
 	do{
 		r = GenFloat(a, b, min, max);
-		LReference x = lx;
+		x = lx;
 		while(!x.IsEmptyList()){
-			float m = x.Car().GetFloat();
+			m = x.Car().GetFloat();
 			if(Abs(m - r) < EPSILON){
 				break;
 			}
 			x = x.Cdr();
 		}
-		if(x.IsEmptyList())
-			break;
-	}while(1);
+	}while(!x.IsEmptyList());
 	return r;
 }
 
