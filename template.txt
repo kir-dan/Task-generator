@@ -11,11 +11,10 @@
 (= ans (generatefrac -1 1 2 8))
 (= a (denumerator ans))
 (= c (numerator ans))
+(= b (generateint -1 1))
 
 (= x21 (* c (denumerator x1)))
 (= x22 (* a (numerator x1)))
 
 %%%ANSWER
-$%x1$
-
-$\frac{%x21}{%x22}$
+$%b$

@@ -34,9 +34,9 @@ float Abs(float a)
 float GenSmth(float a, float b, int type = 0)
 {
     if(type){
-        return (b - a + 1)*rand()/(RAND_MAX+1.0) + a - 1;
+        return (b - a + 2)*rand()/(RAND_MAX) + a - 1;
     }
-    return (b - a)*rand()/(RAND_MAX+1.0) + a;
+    return (b - a + 1)*rand()/(RAND_MAX+1.0) + a;
 }
 
 //генерация рандомного целого числа
@@ -69,20 +69,19 @@ float GenFloat(float a, float b, int min = 0, int max = 0)
 //TODO сделать генерацию с ограничениями по функции
 int GenIntWithConfine(LReference lx, int a, int b)
 {
-	int r;
+	int r, m;
+	LReference x;
 	do{
 		r = GenInt(a, b);
-		LReference x = lx;
+		x = lx;
 		while(!x.IsEmptyList()){
-			int m = x.Car().GetInt();
+			m = x.Car().GetInt();
 			if(m == r){
 				break;
 			}
 			x = x.Cdr();
 		}
-		if(x.IsEmptyList())
-			break;
-	}while(1);
+	}while(!x.IsEmptyList());
 	return r;
 }
 
