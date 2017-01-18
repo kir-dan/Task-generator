@@ -1,6 +1,5 @@
 #define EPSILON 0.000000000000001
 //TODO написать функцию, которая генерирует числа float, способные преобразовываться в дробь?
-//TODO проверить все функции генерации
 //степень
 int Pow(int a, int b)
 {
@@ -226,7 +225,6 @@ DoApply(int paramsc, const SReference paramsv[], IntelibContinuation& lf) const
 
 //генерация дроби
 //GENERATFRAC(MIN, MAX, MIN_ZNAM, MAX_ZNAM)
-//TODO переписать дробь как список из двух чисел, тогда вычисления будут проще
 //TODO написать арифметику для дробей or переписать всю арифметику так, чтобы она срабатывала с дробями
 //TODO написать функцию makefrac из двуз целых чисел
 class LFunctionGenerateFrac: public SExpressionFunction {
