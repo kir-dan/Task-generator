@@ -48,7 +48,6 @@ int GenInt(int a, int b)
 }
 
 //генерация рандомного вещественного числа с заданным количеством цифр после запятой
-//TODO проверить ограничения генерации
 float GenFloat(float a, float b, int min = 0, int max = 0)
 {
 	float r;
@@ -59,7 +58,7 @@ float GenFloat(float a, float b, int min = 0, int max = 0)
 	int n = Pow(10, max);
     int m = Pow(10, max - min + 1);
 	do{
-	    r = GenSmth(a, b);
+	    r = GenSmth(a, b - 1);
         r -= (r * n - (int)(r * n)) / n;
 	}while((int)(r * n) % m == 0);
 	return r;
