@@ -277,7 +277,7 @@ void LFunctionFloatFFrac::
 DoApply(int paramsc, const SReference paramsv[], IntelibContinuation& lf) const
 {
 	try{
-		float f = paramsv[0].Cdr().Car().GetFloat() / paramsv[0].Cdr().Cdr().Car().GetInt();
+		float f = paramsv[0].Car().GetFloat() / paramsv[0].Cdr().Car().GetInt();
 		lf.RegularReturn(f);
 	}catch(...){
 		lf.RegularReturn(paramsv[0]);
