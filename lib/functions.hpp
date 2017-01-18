@@ -1,5 +1,5 @@
 #define EPSILON 0.000000000000001
-
+//TODO написать функцию, которая генерирует числа float, способные преобразовываться в дробь?
 //TODO проверить все функции генерации
 //степень
 int Pow(int a, int b)
@@ -107,7 +107,7 @@ float GenFloatWithConfine(LReference lx, float a, float b, int min, int max)
 }
 
 //проверка двух чисел на то, что они могут являться рациональной дробью
-bool CheckNM(int n, int m, float a, float b)
+bool CheckNumDenum(int n, int m, float a, float b)
 {
 	float fn = n, fm = m;
 	int mn = Abs(n), mm = Abs(m);
@@ -115,6 +115,22 @@ bool CheckNM(int n, int m, float a, float b)
 	    (((mn > mm) && (mm % mn != 0)) || ((mm > mn) && (mn % mm != 0))) &&
 	    (fn / fm - a > EPSILON) &&
 	    (fn / fm - b < EPSILON);
+}
+
+LReference GenFrac(float a, float b, int den_a, int den_b)
+{
+    int denum = GenInt(den_a, den_b);
+	int num_a = - den_a * den_b;
+	int num_b = den_a * den_b;
+	int num;
+
+	do{
+	    num = GenInt(num_a, num_b);
+	}while(!CheckNumDenum(num, denum, a, b));
+
+	LListConstructor L;
+	LReference re = (L| num, denum);
+	return re;
 }
 
 //вычисление выражение с кавычкой
@@ -213,31 +229,38 @@ void LFunctionGenerateFrac::
 DoApply(int paramsc, const SReference paramsv[], IntelibContinuation& lf) const
 {
 	int m;
+	LReference re;
 	if(paramsc > 5){
-		m = GenIntWithConfine(paramsv[5], paramsv[2].GetInt(), paramsv[3].GetInt());
+	  //  re = GetFracWithConfine();
 	}else{
-		m = GenInt(paramsv[2].GetInt(), paramsv[3].GetInt());
+	    re = GenFrac(paramsv[0].GetFloat(), paramsv[1].GetFloat(),
+	        paramsv[2].GetInt(), paramsv[3].GetInt());
 	}
-	int a = - paramsv[3].GetInt()*paramsv[2].GetInt();
-	int b = paramsv[3].GetInt()*paramsv[2].GetInt();
-	int n = GenInt(a, b);
-	if(paramsc > 4){
-		while(1){
-			n = GenIntWithConfine(paramsv[4], a, b);
-			if(CheckNM(n, m, paramsv[0].GetFloat(), paramsv[1].GetFloat()))
-				break;
-		}
-	}else{
-		while(1){
-			if(CheckNM(n, m, paramsv[0].GetFloat(), paramsv[1].GetFloat()))
-				break;
-			else
-				n = GenInt(a, b);
-		}
-	}
-	LListConstructor L;
-	LFunctionalSymbol<LFunctionQuotient> fq("/");
-	LReference re = (L| fq, n, m);
+//	if(paramsc > 5){
+//		m = GenIntWithConfine(paramsv[5], paramsv[2].GetInt(), paramsv[3].GetInt());
+//	}else{
+//		m = GenInt(paramsv[2].GetInt(), paramsv[3].GetInt());
+//	}
+//	int a = - paramsv[3].GetInt()*paramsv[2].GetInt();
+//	int b = paramsv[3].GetInt()*paramsv[2].GetInt();
+//	int n = GenInt(a, b);
+//	if(paramsc > 4){
+//		while(1){
+//			n = GenIntWithConfine(paramsv[4], a, b);
+//			if(CheckNumDenum(n, m, paramsv[0].GetFloat(), paramsv[1].GetFloat()))
+//				break;
+//		}
+//	}else{
+//		while(1){
+//			if(CheckNumDenum(n, m, paramsv[0].GetFloat(), paramsv[1].GetFloat()))
+//				break;
+//			else
+//				n = GenInt(a, b);
+//		}
+//	}
+//	LListConstructor L;
+//	LFunctionalSymbol<LFunctionQuotient> fq("/");
+//	LReference re = (L| fq, n, m);
 //	float res = re.Evaluate().GetFloat();
     lf.RegularReturn(re);
 }

@@ -57,8 +57,8 @@ const char * beautynum(IntelibReader &reader, const char* str)
 		reader.FeedChar('\n');
 		while(!reader.IsReady()){}
 		LReference ref = reader.Get();
-		int n = ref.Cdr().Car().GetInt();
-		int m = ref.Cdr().Cdr().Car().GetInt();
+		int n = ref.Car().GetInt();
+		int m = ref.Cdr().Car().GetInt();
 		if(n < 0){
 			n = -n;
 			sprintf(new_str, "-\\frac{%d}{%d}", n, m);

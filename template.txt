@@ -6,15 +6,9 @@
 
 %%%SOLVE
 
-(= m (generatefloat -1 1 1 5))
 (= x1 (generatefrac -1 1 2 8))
-(= ans (generatefrac -1 1 2 8))
-(= a (denumerator ans))
-(= c (numerator ans))
-(= b (generateint -1 1))
-
-(= x21 (* c (denumerator x1)))
-(= x22 (* a (numerator x1)))
+(= a 5)
+(= c 3)
 
 %%%ANSWER
-$%m$
+$%x1$
