@@ -66,23 +66,40 @@ float GenFloat(float a, float b, int min = 0, int max = 0)
 	return r;
 }
 
+bool ConfineInt(int r, LReference x)
+{
+    int m;
+    while(!x.IsEmptyList()){
+        m = x.Car().GetInt();
+        if(m == r){
+            break;
+        }
+        x = x.Cdr();
+    }
+    return x.IsEmptyList();
+}
+
+bool ConfineFloat(float r, LReference x)
+{
+    float m;
+    while(!x.IsEmptyList()){
+        m = x.Car().GetFloat();
+        if(Abs(m - r) < EPSILON){
+            break;
+        }
+        x = x.Cdr();
+    }
+    return x.IsEmptyList();
+}
+
 //генерация целого с ограничениями по списку
 //TODO сделать генерацию с ограничениями по функции
 int GenIntWithConfine(LReference lx, int a, int b)
 {
-	int r, m;
-	LReference x;
+	int r;
 	do{
 		r = GenInt(a, b);
-		x = lx;
-		while(!x.IsEmptyList()){
-			m = x.Car().GetInt();
-			if(m == r){
-				break;
-			}
-			x = x.Cdr();
-		}
-	}while(!x.IsEmptyList());
+	}while(!ConfineInt(r, lx));
 	return r;
 }
 
@@ -90,19 +107,10 @@ int GenIntWithConfine(LReference lx, int a, int b)
 //TODO сделать генерацию с ограничениями по функции
 float GenFloatWithConfine(LReference lx, float a, float b, int min, int max)
 {
-	float r, m;
-	LReference x;
+	float r;
 	do{
 		r = GenFloat(a, b, min, max);
-		x = lx;
-		while(!x.IsEmptyList()){
-			m = x.Car().GetFloat();
-			if(Abs(m - r) < EPSILON){
-				break;
-			}
-			x = x.Cdr();
-		}
-	}while(!x.IsEmptyList());
+	}while(!ConfineFloat(r, lx));
 	return r;
 }
 

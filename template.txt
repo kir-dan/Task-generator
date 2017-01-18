@@ -6,7 +6,7 @@
 
 %%%SOLVE
 
-(= x1 (generatefrac -1 1 2 8))
+(= x1 (generateint -1 1 '(0)))
 (= a 5)
 (= c 3)
 
