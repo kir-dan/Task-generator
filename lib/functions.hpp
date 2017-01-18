@@ -112,16 +112,14 @@ bool CheckNumDenum(int n, int m, float a, float b)
 	float fn = n, fm = m;
 	int mn = Abs(n), mm = Abs(m);
 	return (n != 0) &&
-	    (((mn > mm) && (mm % mn != 0)) || ((mm > mn) && (mn % mm != 0))) &&
-	    (fn / fm - a > EPSILON) &&
-	    (fn / fm - b < EPSILON);
+	    ((mn == 1) || ((mn > mm) && (mn % mm != 0)) || ((mm >= mn) && (mm % mn != 0)));
 }
 
 LReference GenFrac(float a, float b, int den_a, int den_b)
 {
     int denum = GenInt(den_a, den_b);
-	int num_a = - den_a * den_b;
-	int num_b = den_a * den_b;
+	int num_a = a * denum;
+	int num_b = b * denum;
 	int num;
 
 	do{
