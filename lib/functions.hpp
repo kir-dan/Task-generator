@@ -139,6 +139,17 @@ LReference GenFrac(float a, float b, int den_a, int den_b)
 	return re;
 }
 
+LReference GenFracWithConfine(float a, float b, int den_a, int den_b,
+    LReference num_conf, LReference denum_conf)
+{
+    LReference frac;
+    do{
+        frac = GenFrac(a, b, den_a, den_b);
+    }while(!ConfineInt(frac.Car().GetInt(), num_conf) ||
+        !ConfineInt(frac.Cdr().Car().GetInt(), denum_conf));
+    return frac;
+}
+
 //вычисление выражение с кавычкой
 static SReference QuoteExpression(const SReference &ref, void *m)
 {
@@ -234,40 +245,17 @@ SString LFunctionGenerateFrac:: TextRepresentation() const
 void LFunctionGenerateFrac::
 DoApply(int paramsc, const SReference paramsv[], IntelibContinuation& lf) const
 {
-	int m;
+    float a = paramsv[0].GetFloat(), b = paramsv[1].GetFloat();
+    int den_a = paramsv[2].GetInt(), den_b = paramsv[3].GetInt();
 	LReference re;
-	if(paramsc > 5){
-	  //  re = GetFracWithConfine();
+	if(paramsc == 5){
+	    LListConstructor L;
+        re = GenFracWithConfine(a, b, den_a, den_b, (L| NULL), paramsv[4]);
+	}else if(paramsc == 6){
+        re = GenFracWithConfine(a, b, den_a, den_b, paramsv[4], paramsv[5]);
 	}else{
-	    re = GenFrac(paramsv[0].GetFloat(), paramsv[1].GetFloat(),
-	        paramsv[2].GetInt(), paramsv[3].GetInt());
+	    re = GenFrac(a, b, den_a, den_b);
 	}
-//	if(paramsc > 5){
-//		m = GenIntWithConfine(paramsv[5], paramsv[2].GetInt(), paramsv[3].GetInt());
-//	}else{
-//		m = GenInt(paramsv[2].GetInt(), paramsv[3].GetInt());
-//	}
-//	int a = - paramsv[3].GetInt()*paramsv[2].GetInt();
-//	int b = paramsv[3].GetInt()*paramsv[2].GetInt();
-//	int n = GenInt(a, b);
-//	if(paramsc > 4){
-//		while(1){
-//			n = GenIntWithConfine(paramsv[4], a, b);
-//			if(CheckNumDenum(n, m, paramsv[0].GetFloat(), paramsv[1].GetFloat()))
-//				break;
-//		}
-//	}else{
-//		while(1){
-//			if(CheckNumDenum(n, m, paramsv[0].GetFloat(), paramsv[1].GetFloat()))
-//				break;
-//			else
-//				n = GenInt(a, b);
-//		}
-//	}
-//	LListConstructor L;
-//	LFunctionalSymbol<LFunctionQuotient> fq("/");
-//	LReference re = (L| fq, n, m);
-//	float res = re.Evaluate().GetFloat();
     lf.RegularReturn(re);
 }
 
