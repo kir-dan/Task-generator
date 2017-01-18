@@ -225,7 +225,6 @@ DoApply(int paramsc, const SReference paramsv[], IntelibContinuation& lf) const
 //генерация дроби
 //GENERATFRAC(MIN, MAX, MIN_ZNAM, MAX_ZNAM)
 //TODO написать арифметику для дробей or переписать всю арифметику так, чтобы она срабатывала с дробями
-//TODO написать функцию makefrac из двуз целых чисел
 class LFunctionGenerateFrac: public SExpressionFunction {
 public:
     LFunctionGenerateFrac() : SExpressionFunction(4, 6){}
@@ -331,6 +330,28 @@ DoApply(int paramsc, const SReference paramsv[], IntelibContinuation& lf) const
 	}
 }
 
+//получение дроби из двух целых чисел
+//makefrac
+class LFunctionMakeFrac : public SExpressionFunction {
+public:
+    LFunctionMakeFrac() : SExpressionFunction(2, 2){}
+    virtual SString TextRepresentation() const;
+    void DoApply(int paramsc, const SReference *paramsv, IntelibContinuation &lf) const;
+};
+
+SString LFunctionMakeFrac :: TextRepresentation() const
+{
+    return SString("#<FUNCTION MAKEFRAC>");
+}
+
+void LFunctionMakeFrac::
+DoApply(int paramsc, const SReference paramsv[], IntelibContinuation& lf) const
+{
+	LListConstructor L;
+	LReference res = (L| paramsv[0].GetInt(), paramsv[1].GetInt());
+    lf.RegularReturn(res);
+}
+
 LExpressionPackage * MakeMyPackage(Table* table)
 {
     LExpressionPackage *p = new LExpressionPackageIntelib;
@@ -400,6 +421,8 @@ LExpressionPackage * MakeMyPackage(Table* table)
     p->Import(s_32);
     LFunctionalSymbol<SFunctionTan> s_33("TAN");
     p->Import(s_33);
+    LFunctionalSymbol<LFunctionMakeFrac> s_34("MAKEFRAC");
+    p->Import(s_34);
     while(table != NULL){
         LSymbol symb(table->name);
         symb->SetDynamicValue(table->value);
