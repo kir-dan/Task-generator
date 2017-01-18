@@ -302,7 +302,7 @@ void LFunctionFracNumerator::
 DoApply(int paramsc, const SReference paramsv[], IntelibContinuation& lf) const
 {
 	try{
-		int f = paramsv[0].Cdr().Car().GetInt();
+		int f = paramsv[0].Car().GetInt();
 		lf.RegularReturn(f);
 	}catch(...){
 		lf.RegularReturn(paramsv[0].GetFloat());
@@ -327,7 +327,7 @@ void LFunctionFracDenumerator::
 DoApply(int paramsc, const SReference paramsv[], IntelibContinuation& lf) const
 {
 	try{
-		int f = paramsv[0].Cdr().Cdr().Car().GetInt();
+		int f = paramsv[0].Cdr().Car().GetInt();
 		lf.RegularReturn(f);
 	}catch(...){
 		lf.RegularReturn(paramsv[0].GetFloat());
