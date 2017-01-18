@@ -18,7 +18,7 @@ FILE * openReadFile(char* name)
 }
 
 //открытие файла для записи
-//TODO дописать тут комментарий
+//Если указано имя файла в командной строке, то берем его, иначе дефолтное значение
 FILE * openWriteFile(int argc, char** argv, const char *def)
 {
 	FILE * fd;
