@@ -237,7 +237,6 @@ SString LFunctionGenerateFrac:: TextRepresentation() const
     return SString("#<FUNCTION GENERATEFRAC>");
 }
 
-//TODO Evaluate надо заменить: TailReturn или типа того
 void LFunctionGenerateFrac::
 DoApply(int paramsc, const SReference paramsv[], IntelibContinuation& lf) const
 {
