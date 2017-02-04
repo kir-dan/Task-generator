@@ -124,12 +124,10 @@ float GenFloatWithConfine(LReference lx, float a, float b, int min, int max)
 }
 
 //проверка двух чисел на то, что они могут являться рациональной дробью
-bool CheckNumDenum(int n, int m, float a, float b)
+bool CheckNumDenum(int n, int m)
 {
-	float fn = n, fm = m;
 	int mn = Abs(n), mm = Abs(m);
-	return (n != 0) &&
-	    ((mn == 1) || ((mn > mm) && (mn % mm != 0)) || ((mm >= mn) && (mm % mn != 0)));
+	return (n != 0) && (m != 0) && ((mn >= mm) ? mn % mm != 0 : true);
 }
 
 LReference GenFrac(float a, float b, int den_a, int den_b)
@@ -141,7 +139,7 @@ LReference GenFrac(float a, float b, int den_a, int den_b)
 
 	do{
 	    num = GenInt(num_a, num_b);
-	}while(!CheckNumDenum(num, denum, a, b));
+	}while(!CheckNumDenum(num, denum));
 
 	LListConstructor L;
 	LReference re = (L| num, denum);
