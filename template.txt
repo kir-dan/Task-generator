@@ -6,7 +6,7 @@
 
 %%%SOLVE
 
-(= x1 (generatefrac 2 5 2 5 '(!= (denumerator x) 3)))
+(= x1 (fracreduction (makefrac 10 8)))
 (= x2 (makefrac 5 2))
 (= x (/ 24 3))
 (= a 2)

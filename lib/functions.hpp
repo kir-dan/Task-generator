@@ -204,6 +204,29 @@ LReference FracDivision(LReference x, LReference y)
     return (L| a * d, b * c);
 }
 
+int NOD(int a, int b)
+{
+    while (a != b){
+        if (a > b)
+            a = a - b;
+        else
+            b = b - a;
+    }
+    return a;
+}
+
+LReference FracReduction(LReference x)
+{
+    LListConstructor L;
+    int a, b, nod;
+    SeparateFrac(x, a, b);
+    nod = NOD(a, b);
+    if (b == nod) {
+        return LReference(a / nod);
+    }
+    return (L| a / nod, b / nod);
+}
+
 //вычисление выражение с кавычкой
 static SReference QuoteExpression(const SReference &ref, void *m)
 {
@@ -521,8 +544,34 @@ DoApply(int paramsc, const SReference paramsv[], IntelibContinuation& lf) const
     lf.RegularReturn(res);
 }
 
+//сокращение дробей
+// / division
+class LFunctionFracReduction : public SExpressionFunction {
+public:
+    LFunctionFracReduction() : SExpressionFunction(1, 1){}
+    virtual SString TextRepresentation() const;
+    void DoApply(int paramsc, const SReference *paramsv, IntelibContinuation &lf) const;
+};
+
+SString LFunctionFracReduction:: TextRepresentation() const
+{
+    return SString("#<FUNCTION FRUCREDUCTION>");
+}
+
+void LFunctionFracReduction::
+DoApply(int paramsc, const SReference paramsv[], IntelibContinuation& lf) const
+{
+	LReference a = paramsv[0],
+	    res;
+    if (IsList(a)) {
+        res = FracReduction(a);
+    } else {
+        res = a;
+    }
+    lf.RegularReturn(res);
+}
+
 //TODO описать сокращение дробей
-//TODO ограничение для дроби сделать одно
 LExpressionPackage * MakeMyPackage(Table* table)
 {
     LExpressionPackage *p = new LExpressionPackageIntelib;
@@ -596,6 +645,8 @@ LExpressionPackage * MakeMyPackage(Table* table)
     p->Import(s_34);
     LFunctionalSymbol<LFunctionFuncall> s_35("FUNCALL");
     p->Import(s_35);
+    LFunctionalSymbol<LFunctionFracReduction> s_36("FRACREDUCTION");
+    p->Import(s_36);
     while(table != NULL){
         LSymbol symb(table->name);
         symb->SetDynamicValue(table->value);
