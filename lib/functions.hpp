@@ -64,17 +64,14 @@ float GenFloat(float a, float b, int min = 0, int max = 0)
 	return r;
 }
 
-bool Confine(int r, LReference func, IntelibContinuation& lf)
+bool Confine(int r, LReference func)
 {
     LListConstructor L;
     LFunctionConstructor F;
     LFunctionalSymbol<LFunctionFuncall> FUNCALL("FUNCALL");
-    LReference ANS(r), X = func.Cdr().Car();
-    LReference ref = (L| FUNCALL, (F ^ (L| LAMBDA, (L| X), func)), ANS);
-    lf.RegularReturn(ref);
-    LReference ans = lf.Get();
-    printf("ANSWER %d\n", ans.Evaluate().IsTrue());
-    return ans.Evaluate().IsTrue();
+    LReference VALUE(r), X = func.Cdr().Car();
+    LReference ref = (L| FUNCALL, (F ^ (L| LAMBDA, (L| X), func)), VALUE);
+    return ref.Evaluate().IsTrue();
 }
 
 bool ConfineInt(int r, LReference x)
@@ -105,12 +102,12 @@ bool ConfineFloat(float r, LReference x)
 
 //генерация целого с ограничениями по списку
 //TODO сделать генерацию с ограничениями по функции
-int GenIntWithConfine(LReference lx, int a, int b, IntelibContinuation& lf)
+int GenIntWithConfine(LReference lx, int a, int b)
 {
 	int r;
 	do{
 		r = GenInt(a, b);
-	}while(!Confine(r, lx, lf));
+	}while(!Confine(r, lx));
 	return r;
 }
 
@@ -186,7 +183,7 @@ DoApply(int paramsc, const SReference paramsv[], IntelibContinuation& lf) const
 {
 	int r;
 	if(paramsc > 2){
-		r = GenIntWithConfine(paramsv[2], paramsv[0].GetInt(), paramsv[1].GetInt(), lf);
+		r = GenIntWithConfine(paramsv[2], paramsv[0].GetInt(), paramsv[1].GetInt());
 	}else{
 		r = GenInt(paramsv[0].GetInt(), paramsv[1].GetInt());
 	}
