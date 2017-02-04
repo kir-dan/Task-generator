@@ -100,7 +100,7 @@ bool ConfineFrac(LReference value, LReference func)
     LFunctionalSymbol<LFunctionFuncall> FUNCALL("FUNCALL");
     LReference X = FindVar(func);
     LReference ref = (L| FUNCALL, (F ^ (L| LAMBDA, (L| X), func)), ~value);
-    return ref.Evaluate().IsTrue();
+    return ref.Evaluate().GetInt();
 }
 
 //генерация целого с ограничениями по списку
@@ -301,12 +301,14 @@ DoApply(int paramsc, const SReference paramsv[], IntelibContinuation& lf) const
             conf = 2;
 	    } else {
 		    mx = paramsv[2].GetInt();
+		    mn = mx;
 		}
 		break;
 	case 4:
 	    if(IsList(paramsv[3])) {
 	        conf = 3;
             mx = paramsv[2].GetInt();
+            mn = mx;
 	    } else {
 		    mn = paramsv[2].GetInt();
 		    mx = paramsv[3].GetInt();

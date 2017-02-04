@@ -6,9 +6,8 @@
 
 %%%SOLVE
 
-(= x1 (generatefrac 0 5 2 5))
+(= x1 (generatefrac 0 1 2 5 '(!= x (makefrac 1 2))))
 (= x2 (makefrac 5 2))
-(= x (* x1 x2))
 (= a 2)
 (= c 5)
 
