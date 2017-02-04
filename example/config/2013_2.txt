@@ -1,0 +1,18 @@
+%%%TEMPLATE
+
+Вычислите $\log_{%a} %b \cdot \log_{%d} %a$
+
+%%%ATTRIBUTE
+
+%%%SOLVE
+
+(= a (generateint 5 15))
+(= c (generateint 2 3))
+(= powb (generateint 1 4))
+(= powd (generateint 1 4 '(!= x powb)))
+(= b (pow c powb))
+(= d (pow c powd))
+(= ans (* powb (makefrac 1 powd)))
+
+%%%ANSWER
+$%ans$

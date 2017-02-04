@@ -772,6 +772,29 @@ DoApply(int paramsc, const SReference paramsv[], IntelibContinuation& lf) const
     lf.RegularReturn(res);
 }
 
+//возведение в степень
+// pow
+class LFunctionPow : public SExpressionFunction {
+public:
+    LFunctionPow() : SExpressionFunction(2, 2){}
+    virtual SString TextRepresentation() const;
+    void DoApply(int paramsc, const SReference *paramsv, IntelibContinuation &lf) const;
+};
+
+SString LFunctionPow :: TextRepresentation() const
+{
+    return SString("#<FUNCTION POW>");
+}
+
+void LFunctionPow::
+DoApply(int paramsc, const SReference paramsv[], IntelibContinuation& lf) const
+{
+	int a = paramsv[0].GetInt(),
+	    b = paramsv[1].GetInt();
+    LReference res(Pow(a, b));
+    lf.RegularReturn(res);
+}
+
 LExpressionPackage * MakeMyPackage(Table* table)
 {
     LExpressionPackage *p = new LExpressionPackageIntelib;
@@ -847,6 +870,8 @@ LExpressionPackage * MakeMyPackage(Table* table)
     p->Import(s_35);
     LFunctionalSymbol<LFunctionFracReduction> s_36("FRACREDUCTION");
     p->Import(s_36);
+    LFunctionalSymbol<LFunctionPow> s_37("POW");
+    p->Import(s_37);
     while(table != NULL){
         LSymbol symb(table->name);
         symb->SetDynamicValue(table->value);
