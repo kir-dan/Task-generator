@@ -1,5 +1,4 @@
 #define EPSILON 0.000000000000001
-//TODO написать функцию, которая генерирует числа float, способные преобразовываться в дробь?
 //степень
 int Pow(int a, int b)
 {
@@ -90,7 +89,7 @@ bool Confine(float r, LReference func)
     LFunctionalSymbol<LFunctionFuncall> FUNCALL("FUNCALL");
     LReference VALUE(r), X = FindVar(func);
     LReference ref = (L| FUNCALL, (F ^ (L| LAMBDA, (L| X), func)), VALUE);
-    return ref.Evaluate().IsTrue();
+    return ref.Evaluate().GetInt();
 }
 
 bool ConfineFrac(LReference value, LReference func)
@@ -140,7 +139,6 @@ LReference GenFrac(float a, float b, int den_a, int den_b)
 	do{
 	    num = GenInt(num_a, num_b);
 	}while(!CheckNumDenum(num, denum));
-
 	LListConstructor L;
 	LReference re = (L| num, denum);
 	return re;
@@ -168,13 +166,14 @@ void SeparateFrac(LReference x, int &a, int &b)
 
 int NOD(int a, int b)
 {
-    while (a != b){
-        if (a > b)
-            a = a - b;
+    int aa = Abs(a), ab = Abs(b);
+    while (aa != ab){
+        if (aa > ab)
+            aa = aa - ab;
         else
-            b = b - a;
+            ab = ab - aa;
     }
-    return a;
+    return aa;
 }
 
 LReference FracReduction(LReference x)
@@ -182,6 +181,9 @@ LReference FracReduction(LReference x)
     LListConstructor L;
     int a, b, nod;
     SeparateFrac(x, a, b);
+    if (a == 0) {
+        return LReference(0);
+    }
     nod = NOD(a, b);
     if (b == nod) {
         return LReference(a / nod);
@@ -332,7 +334,6 @@ DoApply(int paramsc, const SReference paramsv[], IntelibContinuation& lf) const
 
 //генерация дроби
 //GENERATFRAC(MIN, MAX, MIN_ZNAM, MAX_ZNAM)
-//TODO написать арифметику для дробей or переписать всю арифметику так, чтобы она срабатывала с дробями
 class LFunctionGenerateFrac: public SExpressionFunction {
 public:
     LFunctionGenerateFrac() : SExpressionFunction(4, 5){}
@@ -453,6 +454,7 @@ DoApply(int paramsc, const SReference paramsv[], IntelibContinuation& lf) const
 {
 	LListConstructor L;
 	LReference res = (L| paramsv[0].GetInt(), paramsv[1].GetInt());
+    printf("%d %d\n", paramsv[0].GetInt(), paramsv[1].GetInt());
     lf.RegularReturn(res);
 }
 
