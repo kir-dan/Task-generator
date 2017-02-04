@@ -132,14 +132,12 @@ LReference GenFrac(float a, float b, int den_a, int den_b)
 	return re;
 }
 
-LReference GenFracWithConfine(float a, float b, int den_a, int den_b,
-    LReference num_conf, LReference denum_conf)
+LReference GenFracWithConfine(float a, float b, int den_a, int den_b, LReference conf)
 {
     LReference frac;
     do{
         frac = GenFrac(a, b, den_a, den_b);
-    }while(!Confine(frac.Car().GetInt(), num_conf) ||
-        !Confine(frac.Cdr().Car().GetInt(), denum_conf));
+    }while(!Confine(frac, conf));
     return frac;
 }
 
@@ -230,7 +228,7 @@ DoApply(int paramsc, const SReference paramsv[], IntelibContinuation& lf) const
 
 //генерация вещественного значенияс определенным количеством знаков после запятой
 //GENERATEFLOAT(MIN, MAX, MAX_C_ZN/[MIN_C_ZN, MAX_C_ZN, EXCEPTION])
-//TODO переделать определение параметров
+//TODO переделать определение параметров -- сделать функцию ограничений по-другому
 class LFunctionGenerateFloat: public SExpressionFunction {
 public:
     LFunctionGenerateFloat() : SExpressionFunction(2, 5){}
@@ -279,7 +277,7 @@ DoApply(int paramsc, const SReference paramsv[], IntelibContinuation& lf) const
 //TODO написать арифметику для дробей or переписать всю арифметику так, чтобы она срабатывала с дробями
 class LFunctionGenerateFrac: public SExpressionFunction {
 public:
-    LFunctionGenerateFrac() : SExpressionFunction(4, 6){}
+    LFunctionGenerateFrac() : SExpressionFunction(4, 5){}
     virtual SString TextRepresentation() const;
     void DoApply(int paramsc, const SReference *paramsv, IntelibContinuation &lf) const;
 };
@@ -296,10 +294,7 @@ DoApply(int paramsc, const SReference paramsv[], IntelibContinuation& lf) const
     int den_a = paramsv[2].GetInt(), den_b = paramsv[3].GetInt();
 	LReference re;
 	if(paramsc == 5){
-	    LListConstructor L;
-        re = GenFracWithConfine(a, b, den_a, den_b, (L| NULL), paramsv[4]);
-	}else if(paramsc == 6){
-        re = GenFracWithConfine(a, b, den_a, den_b, paramsv[4], paramsv[5]);
+        re = GenFracWithConfine(a, b, den_a, den_b, paramsv[4]);
 	}else{
 	    re = GenFrac(a, b, den_a, den_b);
 	}
