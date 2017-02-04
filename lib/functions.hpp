@@ -225,6 +225,24 @@ LReference FracDivision(LReference x, LReference y)
     return FracReduction((L| a * d, b * c));
 }
 
+int FracCmp(LReference x, LReference y)
+{
+    LListConstructor L;
+    int a, b, c, d;
+    LReference xred = FracReduction(x);
+    LReference yred = FracReduction(y);
+    SeparateFrac(xred, a, b);
+    SeparateFrac(yred, c, d);
+
+    if (a == c && b == d) {
+        return 0;
+    } else if (a * d > c * b) {
+        return 1;
+    }
+
+    return -1;
+}
+
 //вычисление выражение с кавычкой
 static SReference QuoteExpression(const SReference &ref, void *m)
 {
@@ -549,7 +567,7 @@ DoApply(int paramsc, const SReference paramsv[], IntelibContinuation& lf) const
 }
 
 //сокращение дробей
-// / division
+// fracreduction
 class LFunctionFracReduction : public SExpressionFunction {
 public:
     LFunctionFracReduction() : SExpressionFunction(1, 1){}
@@ -571,6 +589,169 @@ DoApply(int paramsc, const SReference paramsv[], IntelibContinuation& lf) const
         res = FracReduction(a);
     } else {
         res = a;
+    }
+    lf.RegularReturn(res);
+}
+
+//сравнение дробей и чисел
+// myEqual ==
+class LFunctionMyEqual : public SExpressionFunction {
+public:
+    LFunctionMyEqual() : SExpressionFunction(2, 2){}
+    virtual SString TextRepresentation() const;
+    void DoApply(int paramsc, const SReference *paramsv, IntelibContinuation &lf) const;
+};
+
+SString LFunctionMyEqual :: TextRepresentation() const
+{
+    return SString("#<FUNCTION MYEQUAL>");
+}
+
+void LFunctionMyEqual::
+DoApply(int paramsc, const SReference paramsv[], IntelibContinuation& lf) const
+{
+	LReference a = paramsv[0],
+	    b = paramsv[1],
+	    res;
+    if (IsList(a) || IsList(b)) {
+        res = FracCmp(a, b) == 0;
+    } else {
+        res = Abs(a.GetFloat() - b.GetFloat()) < EPSILON;
+    }
+    lf.RegularReturn(res);
+}
+
+// myNotEqual !=
+class LFunctionMyNotequal : public SExpressionFunction {
+public:
+    LFunctionMyNotequal() : SExpressionFunction(2, 2){}
+    virtual SString TextRepresentation() const;
+    void DoApply(int paramsc, const SReference *paramsv, IntelibContinuation &lf) const;
+};
+
+SString LFunctionMyNotequal :: TextRepresentation() const
+{
+    return SString("#<FUNCTION MYNOTEQUAL>");
+}
+
+void LFunctionMyNotequal::
+DoApply(int paramsc, const SReference paramsv[], IntelibContinuation& lf) const
+{
+	LReference a = paramsv[0],
+	    b = paramsv[1],
+	    res;
+    if (IsList(a) || IsList(b)) {
+        res = FracCmp(a, b) != 0;
+    } else {
+        res = Abs(a.GetFloat() - b.GetFloat()) > EPSILON;
+    }
+    lf.RegularReturn(res);
+}
+
+// mygeq >=
+class LFunctionMyGeq : public SExpressionFunction {
+public:
+    LFunctionMyGeq() : SExpressionFunction(2, 2){}
+    virtual SString TextRepresentation() const;
+    void DoApply(int paramsc, const SReference *paramsv, IntelibContinuation &lf) const;
+};
+
+SString LFunctionMyGeq :: TextRepresentation() const
+{
+    return SString("#<FUNCTION MYGEQ>");
+}
+
+void LFunctionMyGeq::
+DoApply(int paramsc, const SReference paramsv[], IntelibContinuation& lf) const
+{
+	LReference a = paramsv[0],
+	    b = paramsv[1],
+	    res;
+    if (IsList(a) || IsList(b)) {
+        res = FracCmp(a, b) >= 0;
+    } else {
+        res = a.GetFloat() >= b.GetFloat();
+    }
+    lf.RegularReturn(res);
+}
+
+// myleq >=
+class LFunctionMyLeq : public SExpressionFunction {
+public:
+    LFunctionMyLeq() : SExpressionFunction(2, 2){}
+    virtual SString TextRepresentation() const;
+    void DoApply(int paramsc, const SReference *paramsv, IntelibContinuation &lf) const;
+};
+
+SString LFunctionMyLeq :: TextRepresentation() const
+{
+    return SString("#<FUNCTION MYLEQ>");
+}
+
+void LFunctionMyLeq::
+DoApply(int paramsc, const SReference paramsv[], IntelibContinuation& lf) const
+{
+	LReference a = paramsv[0],
+	    b = paramsv[1],
+	    res;
+    if (IsList(a) || IsList(b)) {
+        res = FracCmp(a, b) <= 0;
+    } else {
+        res = a.GetFloat() <= b.GetFloat();
+    }
+    lf.RegularReturn(res);
+}
+
+// mylessp <
+class LFunctionMyLessp : public SExpressionFunction {
+public:
+    LFunctionMyLessp() : SExpressionFunction(2, 2){}
+    virtual SString TextRepresentation() const;
+    void DoApply(int paramsc, const SReference *paramsv, IntelibContinuation &lf) const;
+};
+
+SString LFunctionMyLessp :: TextRepresentation() const
+{
+    return SString("#<FUNCTION MYLESSP>");
+}
+
+void LFunctionMyLessp::
+DoApply(int paramsc, const SReference paramsv[], IntelibContinuation& lf) const
+{
+	LReference a = paramsv[0],
+	    b = paramsv[1],
+	    res;
+    if (IsList(a) || IsList(b)) {
+        res = FracCmp(a, b) < 0;
+    } else {
+        res = a.GetFloat() < b.GetFloat();
+    }
+    lf.RegularReturn(res);
+}
+
+// mygreaterp >
+class LFunctionMyGreaterp : public SExpressionFunction {
+public:
+    LFunctionMyGreaterp() : SExpressionFunction(2, 2){}
+    virtual SString TextRepresentation() const;
+    void DoApply(int paramsc, const SReference *paramsv, IntelibContinuation &lf) const;
+};
+
+SString LFunctionMyGreaterp :: TextRepresentation() const
+{
+    return SString("#<FUNCTION MYGREATERP>");
+}
+
+void LFunctionMyGreaterp::
+DoApply(int paramsc, const SReference paramsv[], IntelibContinuation& lf) const
+{
+	LReference a = paramsv[0],
+	    b = paramsv[1],
+	    res;
+    if (IsList(a) || IsList(b)) {
+        res = FracCmp(a, b) > 0;
+    } else {
+        res = a.GetFloat() > b.GetFloat();
     }
     lf.RegularReturn(res);
 }
@@ -598,17 +779,17 @@ LExpressionPackage * MakeMyPackage(Table* table)
     p->Import(s_9);
     LFunctionalSymbol<LFunctionIf> s_10("IF");
     p->Import(s_10);
-    LFunctionalSymbol<LFunctionMathequal> s_11("==");
+    LFunctionalSymbol<LFunctionMyEqual> s_11("==");
     p->Import(s_11);
-    LFunctionalSymbol<LFunctionMathnotequal> s_12("!=");
+    LFunctionalSymbol<LFunctionMyNotequal> s_12("!=");
     p->Import(s_12);
-    LFunctionalSymbol<LFunctionMathgeq> s_13(">=");
+    LFunctionalSymbol<LFunctionMyGeq> s_13(">=");
     p->Import(s_13);
-    LFunctionalSymbol<LFunctionMathleq> s_14("<=");
+    LFunctionalSymbol<LFunctionMyLeq> s_14("<=");
     p->Import(s_14);
-    LFunctionalSymbol<LFunctionLessp> s_15("<");
+    LFunctionalSymbol<LFunctionMyLessp> s_15("<");
     p->Import(s_15);
-    LFunctionalSymbol<LFunctionGreaterp> s_16(">");
+    LFunctionalSymbol<LFunctionMyGreaterp> s_16(">");
     p->Import(s_16);
 	LFunctionalSymbol<SFunctionAnd> s_17("AND");
 	p->Import(s_17);
