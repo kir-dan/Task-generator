@@ -64,6 +64,19 @@ float GenFloat(float a, float b, int min = 0, int max = 0)
 	return r;
 }
 
+bool Confine(int r, LReference func, IntelibContinuation& lf)
+{
+    LListConstructor L;
+    LFunctionConstructor F;
+    LFunctionalSymbol<LFunctionFuncall> FUNCALL("FUNCALL");
+    LReference ANS(r), X = func.Cdr().Car();
+    LReference ref = (L| FUNCALL, (F ^ (L| LAMBDA, (L| X), func)), ANS);
+    lf.RegularReturn(ref);
+    LReference ans = lf.Get();
+    printf("ANSWER %d\n", ans.Evaluate().IsTrue());
+    return ans.Evaluate().IsTrue();
+}
+
 bool ConfineInt(int r, LReference x)
 {
     int m;
@@ -92,12 +105,12 @@ bool ConfineFloat(float r, LReference x)
 
 //генерация целого с ограничениями по списку
 //TODO сделать генерацию с ограничениями по функции
-int GenIntWithConfine(LReference lx, int a, int b)
+int GenIntWithConfine(LReference lx, int a, int b, IntelibContinuation& lf)
 {
 	int r;
 	do{
 		r = GenInt(a, b);
-	}while(!ConfineInt(r, lx));
+	}while(!Confine(r, lx, lf));
 	return r;
 }
 
@@ -173,7 +186,7 @@ DoApply(int paramsc, const SReference paramsv[], IntelibContinuation& lf) const
 {
 	int r;
 	if(paramsc > 2){
-		r = GenIntWithConfine(paramsv[2], paramsv[0].GetInt(), paramsv[1].GetInt());
+		r = GenIntWithConfine(paramsv[2], paramsv[0].GetInt(), paramsv[1].GetInt(), lf);
 	}else{
 		r = GenInt(paramsv[0].GetInt(), paramsv[1].GetInt());
 	}
@@ -422,6 +435,8 @@ LExpressionPackage * MakeMyPackage(Table* table)
     p->Import(s_33);
     LFunctionalSymbol<LFunctionMakeFrac> s_34("MAKEFRAC");
     p->Import(s_34);
+    LFunctionalSymbol<LFunctionFuncall> s_35("FUNCALL");
+    p->Import(s_35);
     while(table != NULL){
         LSymbol symb(table->name);
         symb->SetDynamicValue(table->value);
