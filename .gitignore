@@ -165,13 +165,13 @@ example/config/template_11.3.txt
 lib/.DS_Store
 lit/.DS_Store
 node_modules/
-example/generated /2013_1_task.pdf
+task.pdf
 task_generator
 task_generator.dSYM/
 tasks/
 intelib/
-/2013_1.txt
-!/2013_1.txt
-!/example/generated /2013_1_task.pdf
-/example/generated /2013_1_task.pdf
-/2013_1_answer.pdf
+/template.txt
+!/template.txt
+!/task.pdf
+/task.pdf
+/answer.pdf
