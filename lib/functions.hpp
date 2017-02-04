@@ -177,6 +177,15 @@ LReference FracDiff(LReference x, LReference y)
     return (L| a * d - c * b, b * d);
 }
 
+LReference FracMulti(LReference x, LReference y)
+{
+    LListConstructor L;
+    int a, b, c, d;
+    SeparateFrac(x, a, b);
+    SeparateFrac(y, c, d);
+    return (L| a * c, b * d);
+}
+
 //вычисление выражение с кавычкой
 static SReference QuoteExpression(const SReference &ref, void *m)
 {
@@ -437,6 +446,34 @@ DoApply(int paramsc, const SReference paramsv[], IntelibContinuation& lf) const
     lf.RegularReturn(res);
 }
 
+//умножение дробей и чисел
+//* multi
+class LFunctionMulti : public SExpressionFunction {
+public:
+    LFunctionMulti() : SExpressionFunction(2, 2){}
+    virtual SString TextRepresentation() const;
+    void DoApply(int paramsc, const SReference *paramsv, IntelibContinuation &lf) const;
+};
+
+SString LFunctionMulti :: TextRepresentation() const
+{
+    return SString("#<FUNCTION MULTI>");
+}
+
+void LFunctionMulti::
+DoApply(int paramsc, const SReference paramsv[], IntelibContinuation& lf) const
+{
+	LReference a = paramsv[0],
+	    b = paramsv[1],
+	    res;
+    if (IsList(a) || IsList(b)) {
+        res = FracMulti(a, b);
+    } else {
+        res = a.GetFloat() * b.GetFloat();
+    }
+    lf.RegularReturn(res);
+}
+
 LExpressionPackage * MakeMyPackage(Table* table)
 {
     LExpressionPackage *p = new LExpressionPackageIntelib;
@@ -446,7 +483,7 @@ LExpressionPackage * MakeMyPackage(Table* table)
     p->Import(s_2);
     LFunctionalSymbol<LFunctionDefvar> s_3("=");
     p->Import(s_3);
-    LFunctionalSymbol<LFunctionTimes> s_4("*");
+    LFunctionalSymbol<LFunctionMulti> s_4("*");
     p->Import(s_4);
     LFunctionalSymbol<LFunctionQuotient> s_5("/");
     p->Import(s_5);
