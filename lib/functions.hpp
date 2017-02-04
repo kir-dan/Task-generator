@@ -64,12 +64,25 @@ float GenFloat(float a, float b, int min = 0, int max = 0)
 	return r;
 }
 
+LReference FindVar(LReference func)
+{
+    try {
+        func.Evaluate();
+        return func;
+    } catch(const IntelibX& ex) {
+        if (ex.Parameter().GetPtr()){
+            return ex.Parameter();
+        }
+        throw ex;
+    }
+}
+
 bool Confine(int r, LReference func)
 {
     LListConstructor L;
     LFunctionConstructor F;
     LFunctionalSymbol<LFunctionFuncall> FUNCALL("FUNCALL");
-    LReference VALUE(r), X = func.Cdr().Car();
+    LReference VALUE(r), X = FindVar(func);
     LReference ref = (L| FUNCALL, (F ^ (L| LAMBDA, (L| X), func)), VALUE);
     return ref.Evaluate().IsTrue();
 }
