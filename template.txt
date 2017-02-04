@@ -6,7 +6,7 @@
 
 %%%SOLVE
 
-(= x1 (generateint 3 5 '(!= x 4)))
+(= x1 (generatefloat 0 5 1 5 '(> x 3)))
 (= a (numerator x1))
 (= c (denumerator x1))
 

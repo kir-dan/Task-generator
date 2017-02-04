@@ -77,7 +77,7 @@ LReference FindVar(LReference func)
     }
 }
 
-bool Confine(int r, LReference func)
+bool Confine(float r, LReference func)
 {
     LListConstructor L;
     LFunctionConstructor F;
@@ -87,34 +87,7 @@ bool Confine(int r, LReference func)
     return ref.Evaluate().IsTrue();
 }
 
-bool ConfineInt(int r, LReference x)
-{
-    int m;
-    while(!x.IsEmptyList()){
-        m = x.Car().GetInt();
-        if(m == r){
-            break;
-        }
-        x = x.Cdr();
-    }
-    return x.IsEmptyList();
-}
-
-bool ConfineFloat(float r, LReference x)
-{
-    float m;
-    while(!x.IsEmptyList()){
-        m = x.Car().GetFloat();
-        if(Abs(m - r) < EPSILON){
-            break;
-        }
-        x = x.Cdr();
-    }
-    return x.IsEmptyList();
-}
-
 //генерация целого с ограничениями по списку
-//TODO сделать генерацию с ограничениями по функции
 int GenIntWithConfine(LReference lx, int a, int b)
 {
 	int r;
@@ -125,13 +98,12 @@ int GenIntWithConfine(LReference lx, int a, int b)
 }
 
 //генерация вещественного с ограничениями по списку
-//TODO сделать генерацию с ограничениями по функции
 float GenFloatWithConfine(LReference lx, float a, float b, int min, int max)
 {
 	float r;
 	do{
 		r = GenFloat(a, b, min, max);
-	}while(!ConfineFloat(r, lx));
+	}while(!Confine(r, lx));
 	return r;
 }
 
@@ -206,6 +178,7 @@ DoApply(int paramsc, const SReference paramsv[], IntelibContinuation& lf) const
 
 //генерация вещественного значенияс определенным количеством знаков после запятой
 //GENERATEFLOAT(MIN, MAX, MAX_C_ZN/[MIN_C_ZN, MAX_C_ZN, EXCEPTION])
+//TODO переделать определение параметров
 class LFunctionGenerateFloat: public SExpressionFunction {
 public:
     LFunctionGenerateFloat() : SExpressionFunction(3, 5){}
