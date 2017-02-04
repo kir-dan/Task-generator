@@ -168,42 +168,6 @@ void SeparateFrac(LReference x, int &a, int &b)
     }
 }
 
-LReference FracSum(LReference x, LReference y)
-{
-    LListConstructor L;
-    int a, b, c, d;
-    SeparateFrac(x, a, b);
-    SeparateFrac(y, c, d);
-    return (L| a * d + c * b, b * d);
-}
-
-LReference FracDiff(LReference x, LReference y)
-{
-    LListConstructor L;
-    int a, b, c, d;
-    SeparateFrac(x, a, b);
-    SeparateFrac(y, c, d);
-    return (L| a * d - c * b, b * d);
-}
-
-LReference FracMulti(LReference x, LReference y)
-{
-    LListConstructor L;
-    int a, b, c, d;
-    SeparateFrac(x, a, b);
-    SeparateFrac(y, c, d);
-    return (L| a * c, b * d);
-}
-
-LReference FracDivision(LReference x, LReference y)
-{
-    LListConstructor L;
-    int a, b, c, d;
-    SeparateFrac(x, a, b);
-    SeparateFrac(y, c, d);
-    return (L| a * d, b * c);
-}
-
 int NOD(int a, int b)
 {
     while (a != b){
@@ -225,6 +189,42 @@ LReference FracReduction(LReference x)
         return LReference(a / nod);
     }
     return (L| a / nod, b / nod);
+}
+
+LReference FracSum(LReference x, LReference y)
+{
+    LListConstructor L;
+    int a, b, c, d;
+    SeparateFrac(x, a, b);
+    SeparateFrac(y, c, d);
+    return FracReduction((L| a * d + c * b, b * d));
+}
+
+LReference FracDiff(LReference x, LReference y)
+{
+    LListConstructor L;
+    int a, b, c, d;
+    SeparateFrac(x, a, b);
+    SeparateFrac(y, c, d);
+    return FracReduction((L| a * d - c * b, b * d));
+}
+
+LReference FracMulti(LReference x, LReference y)
+{
+    LListConstructor L;
+    int a, b, c, d;
+    SeparateFrac(x, a, b);
+    SeparateFrac(y, c, d);
+    return FracReduction((L| a * c, b * d));
+}
+
+LReference FracDivision(LReference x, LReference y)
+{
+    LListConstructor L;
+    int a, b, c, d;
+    SeparateFrac(x, a, b);
+    SeparateFrac(y, c, d);
+    return FracReduction((L| a * d, b * c));
 }
 
 //вычисление выражение с кавычкой
@@ -571,7 +571,6 @@ DoApply(int paramsc, const SReference paramsv[], IntelibContinuation& lf) const
     lf.RegularReturn(res);
 }
 
-//TODO описать сокращение дробей
 LExpressionPackage * MakeMyPackage(Table* table)
 {
     LExpressionPackage *p = new LExpressionPackageIntelib;
