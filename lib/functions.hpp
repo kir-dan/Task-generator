@@ -191,13 +191,24 @@ LReference FracReduction(LReference x)
     return (L| a / nod, b / nod);
 }
 
+LReference MakeFrac(int a, int b)
+{
+    LListConstructor L;
+    LReference res;
+    if (b < 0)
+        res = (L| -a, -b);
+    else
+        res = (L| a, b);
+	return res;
+}
+
 LReference FracSum(LReference x, LReference y)
 {
     LListConstructor L;
     int a, b, c, d;
     SeparateFrac(x, a, b);
     SeparateFrac(y, c, d);
-    return FracReduction((L| a * d + c * b, b * d));
+    return FracReduction(MakeFrac(a * d + c * b, b * d));
 }
 
 LReference FracDiff(LReference x, LReference y)
@@ -206,7 +217,7 @@ LReference FracDiff(LReference x, LReference y)
     int a, b, c, d;
     SeparateFrac(x, a, b);
     SeparateFrac(y, c, d);
-    return FracReduction((L| a * d - c * b, b * d));
+    return FracReduction(MakeFrac(a * d - c * b, b * d));
 }
 
 LReference FracMulti(LReference x, LReference y)
@@ -215,7 +226,7 @@ LReference FracMulti(LReference x, LReference y)
     int a, b, c, d;
     SeparateFrac(x, a, b);
     SeparateFrac(y, c, d);
-    return FracReduction((L| a * c, b * d));
+    return FracReduction(MakeFrac(a * c, b * d));
 }
 
 LReference FracDivision(LReference x, LReference y)
@@ -224,7 +235,7 @@ LReference FracDivision(LReference x, LReference y)
     int a, b, c, d;
     SeparateFrac(x, a, b);
     SeparateFrac(y, c, d);
-    return FracReduction((L| a * d, b * c));
+    return FracReduction(MakeFrac(a * d, b * c));
 }
 
 int FracCmp(LReference x, LReference y)
@@ -453,8 +464,9 @@ void LFunctionMakeFrac::
 DoApply(int paramsc, const SReference paramsv[], IntelibContinuation& lf) const
 {
 	LListConstructor L;
-	LReference res = (L| paramsv[0].GetInt(), paramsv[1].GetInt());
-    printf("%d %d\n", paramsv[0].GetInt(), paramsv[1].GetInt());
+	int a = paramsv[0].GetInt(),
+	    b = paramsv[1].GetInt();
+    LReference res = MakeFrac(a, b);
     lf.RegularReturn(res);
 }
 
