@@ -6,9 +6,11 @@
 
 %%%SOLVE
 
-(= x1 (generatefloat 0 5 1 5 '(> x 3)))
-(= a (numerator x1))
-(= c (denumerator x1))
+(= x1 (makefrac 3 2))
+(= x2 (makefrac 1 2))
+(= x (+ 1 2))
+(= a 2)
+(= c 5)
 
 %%%ANSWER
-$%x1$
+$%x$

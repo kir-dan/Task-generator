@@ -138,9 +138,34 @@ LReference GenFracWithConfine(float a, float b, int den_a, int den_b,
     LReference frac;
     do{
         frac = GenFrac(a, b, den_a, den_b);
-    }while(!ConfineInt(frac.Car().GetInt(), num_conf) ||
-        !ConfineInt(frac.Cdr().Car().GetInt(), denum_conf));
+    }while(!Confine(frac.Car().GetInt(), num_conf) ||
+        !Confine(frac.Cdr().Car().GetInt(), denum_conf));
     return frac;
+}
+
+bool IsList(LReference x)
+{
+    return x.TextRepresentation().GetString()[0] == '(';
+}
+
+void SeparateFrac(LReference x, int &a, int &b)
+{
+    if (!IsList(x)) {
+        a = x.GetInt();
+        b = 1;
+    } else {
+        a = x.Car().GetInt();
+        b = x.Cdr().Car().GetInt();
+    }
+}
+
+LReference FracSum(LReference x, LReference y)
+{
+    LListConstructor L;
+    int a, b, c, d;
+    SeparateFrac(x, a, b);
+    SeparateFrac(y, c, d);
+    return (L| a * d + c * b, b * d);
 }
 
 //вычисление выражение с кавычкой
@@ -347,10 +372,38 @@ DoApply(int paramsc, const SReference paramsv[], IntelibContinuation& lf) const
     lf.RegularReturn(res);
 }
 
+//сложение дробей и чисел
+//+ plus
+class LFunctionSum : public SExpressionFunction {
+public:
+    LFunctionSum() : SExpressionFunction(2, 2){}
+    virtual SString TextRepresentation() const;
+    void DoApply(int paramsc, const SReference *paramsv, IntelibContinuation &lf) const;
+};
+
+SString LFunctionSum :: TextRepresentation() const
+{
+    return SString("#<FUNCTION PLUS>");
+}
+
+void LFunctionSum::
+DoApply(int paramsc, const SReference paramsv[], IntelibContinuation& lf) const
+{
+	LReference a = paramsv[0],
+	    b = paramsv[1],
+	    res;
+    if (IsList(a) || IsList(b)) {
+        res = FracSum(a, b);
+    } else {
+        res = a.GetFloat() + b.GetFloat();
+    }
+    lf.RegularReturn(res);
+}
+
 LExpressionPackage * MakeMyPackage(Table* table)
 {
     LExpressionPackage *p = new LExpressionPackageIntelib;
-    LFunctionalSymbol<LFunctionPlus> s_1("+");
+    LFunctionalSymbol<LFunctionSum> s_1("+");
     p->Import(s_1);
     LFunctionalSymbol<LFunctionDifference> s_2("-");
     p->Import(s_2);
