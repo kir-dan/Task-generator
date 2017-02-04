@@ -260,7 +260,6 @@ DoApply(int paramsc, const SReference paramsv[], IntelibContinuation& lf) const
 
 //генерация вещественного значенияс определенным количеством знаков после запятой
 //GENERATEFLOAT(MIN, MAX, MAX_C_ZN/[MIN_C_ZN, MAX_C_ZN, EXCEPTION])
-//TODO переделать определение параметров -- сделать функцию ограничений по-другому
 class LFunctionGenerateFloat: public SExpressionFunction {
 public:
     LFunctionGenerateFloat() : SExpressionFunction(2, 5){}
@@ -276,30 +275,37 @@ SString LFunctionGenerateFloat:: TextRepresentation() const
 void LFunctionGenerateFloat::
 DoApply(int paramsc, const SReference paramsv[], IntelibContinuation& lf) const
 {
-	int mx, mn;
+	int mx = 6, mn = 0, conf = 0;
 	float r, a = paramsv[0].GetFloat(), b = paramsv[1].GetFloat();
 	switch(paramsc){
-	case 2:
-	    mx = 6;
-        r = GenFloat(a, b, mx);
-        break;
 	case 3:
-		mx = paramsv[2].GetInt();
-		r = GenFloat(a, b, mx);
+	    if(IsList(paramsv[2])) {
+            conf = 2;
+	    } else {
+		    mx = paramsv[2].GetInt();
+		}
 		break;
 	case 4:
-		mn = paramsv[2].GetInt();
-		mx = paramsv[3].GetInt();
-		r = GenFloat(a, b, mn, mx);
+	    if(IsList(paramsv[3])) {
+	        conf = 3;
+            mx = paramsv[2].GetInt();
+	    } else {
+		    mn = paramsv[2].GetInt();
+		    mx = paramsv[3].GetInt();
+		}
 		break;
 	case 5:
 		mn = paramsv[2].GetInt();
 		mx = paramsv[3].GetInt();
-		r = GenFloatWithConfine(paramsv[4], a, b, mn, mx);
+		conf = 4;
 		break;
 	default: 
 		break;
 	}
+	if (conf)
+        r = GenFloatWithConfine(paramsv[conf], a, b, mn, mx);
+    else
+        r = GenFloat(a, b, mn, mx);
     LReference res(r);
     lf.RegularReturn(res);
 }
