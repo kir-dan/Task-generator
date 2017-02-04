@@ -6,11 +6,11 @@
 
 %%%SOLVE
 
-(= x1 (makefrac 5 2))
+(= x1 (generatefrac 2 5 2 5 '(!= (denumerator x) 3)))
 (= x2 (makefrac 5 2))
 (= x (/ 24 3))
 (= a 2)
 (= c 5)
 
 %%%ANSWER
-$%x$
+$%x1$

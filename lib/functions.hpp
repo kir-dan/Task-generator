@@ -29,6 +29,11 @@ float Abs(float a)
 		return -a;
 }
 
+bool IsList(LReference x)
+{
+    return x.TextRepresentation().GetString()[0] == '(';
+}
+
 //генерация случайного числа
 float GenSmth(float a, float b, int type = 0)
 {
@@ -66,15 +71,16 @@ float GenFloat(float a, float b, int min = 0, int max = 0)
 
 LReference FindVar(LReference func)
 {
-    try {
-        func.Evaluate();
-        return func;
-    } catch(const IntelibX& ex) {
-        if (ex.Parameter().GetPtr()){
-            return ex.Parameter();
+    LReference X = NIL;
+    while(!func.IsEmptyList() && strcmp(X.TextRepresentation().GetString(), "X")){
+        if (IsList(func.Car())) {
+            X = FindVar(func.Car());
+        } else {
+            X = func.Car();
         }
-        throw ex;
+        func = func.Cdr();
     }
+    return X;
 }
 
 bool Confine(float r, LReference func)
@@ -84,6 +90,16 @@ bool Confine(float r, LReference func)
     LFunctionalSymbol<LFunctionFuncall> FUNCALL("FUNCALL");
     LReference VALUE(r), X = FindVar(func);
     LReference ref = (L| FUNCALL, (F ^ (L| LAMBDA, (L| X), func)), VALUE);
+    return ref.Evaluate().IsTrue();
+}
+
+bool ConfineFrac(LReference value, LReference func)
+{
+    LListConstructor L;
+    LFunctionConstructor F;
+    LFunctionalSymbol<LFunctionFuncall> FUNCALL("FUNCALL");
+    LReference X = FindVar(func);
+    LReference ref = (L| FUNCALL, (F ^ (L| LAMBDA, (L| X), func)), ~value);
     return ref.Evaluate().IsTrue();
 }
 
@@ -137,13 +153,8 @@ LReference GenFracWithConfine(float a, float b, int den_a, int den_b, LReference
     LReference frac;
     do{
         frac = GenFrac(a, b, den_a, den_b);
-    }while(!Confine(frac, conf));
+    }while(!ConfineFrac(frac, conf));
     return frac;
-}
-
-bool IsList(LReference x)
-{
-    return x.TextRepresentation().GetString()[0] == '(';
 }
 
 void SeparateFrac(LReference x, int &a, int &b)
