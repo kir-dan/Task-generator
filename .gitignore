@@ -170,3 +170,8 @@ task_generator
 task_generator.dSYM/
 tasks/
 intelib/
+/template.txt
+!/template.txt
+!/task.pdf
+/task.pdf
+/answer.pdf

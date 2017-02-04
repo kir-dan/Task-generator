@@ -1,3 +1,4 @@
+#define EPSILON 0.000000000000001
 //степень
 int Pow(int a, int b)
 {
@@ -19,7 +20,6 @@ int Abs(int a)
 }
 
 //модуль -- вещенстенные числа
-//TODO сделать сравнение по Epsilon
 float Abs(float a)
 {
 	if(a >= 0)
@@ -28,83 +28,232 @@ float Abs(float a)
 		return -a;
 }
 
+bool IsList(LReference x)
+{
+    return x.TextRepresentation().GetString()[0] == '(';
+}
+
+//генерация случайного числа
+float GenSmth(float a, float b, int type = 0)
+{
+    if(type){
+        return (b - a + 2)*rand()/(RAND_MAX) + a - 1;
+    }
+    return (b - a + 1)*rand()/(RAND_MAX+1.0) + a;
+}
+
 //генерация рандомного целого числа
 int GenInt(int a, int b)
 {
 	if(a >= 0)
-		return (int)(((intelib_float_t)(b - a)*rand()/(RAND_MAX+1.0)) + a);
+		return (int)(GenSmth(a, b));
 	else
-		return (int)(((intelib_float_t)(b - a + 1)*rand()/(RAND_MAX+1.0)) + a - 1);
+		return (int)(GenSmth(a, b, 1));
 }
 
 //генерация рандомного вещественного числа с заданным количеством цифр после запятой
-//TODO пересмотреть идею генерации
-float GenFloat(float a, float b, int min, int max)
+float GenFloat(float a, float b, int min = 0, int max = 0)
 {
 	float r;
+	if (!max) {
+	    max = min;
+	    min = max;
+	}
 	int n = Pow(10, max);
-	r = ((intelib_float_t)(b - a)*rand()/(RAND_MAX+1.0)) + a;
-	r -= (r * n - (int)(r * n)) / n;
-	if(min == 0){
-		return r;	
-	}
-	int m = Pow(10, (max - min + 1));
-	while((int)(r * n) % m == 0){
-		r = ((intelib_float_t)(b - a)*rand()/(RAND_MAX+1.0)) + a;
-		r -= (r * n - (int)(r * n)) / n;
-	}
+    int m = Pow(10, max - min + 1);
+	do{
+	    r = GenSmth(a, b - 1);
+        r -= (r * n - (int)(r * n)) / n;
+	}while((int)(r * n) % m == 0);
 	return r;
 }
 
+LReference FindVar(LReference func)
+{
+    LReference X = NIL;
+    while(!func.IsEmptyList() && strcmp(X.TextRepresentation().GetString(), "X")){
+        if (IsList(func.Car())) {
+            X = FindVar(func.Car());
+        } else {
+            X = func.Car();
+        }
+        func = func.Cdr();
+    }
+    return X;
+}
+
+bool Confine(float r, LReference func)
+{
+    LListConstructor L;
+    LFunctionConstructor F;
+    LFunctionalSymbol<LFunctionFuncall> FUNCALL("FUNCALL");
+    LReference VALUE(r), X = FindVar(func);
+    LReference ref = (L| FUNCALL, (F ^ (L| LAMBDA, (L| X), func)), VALUE);
+    return ref.Evaluate().GetInt();
+}
+
+bool ConfineFrac(LReference value, LReference func)
+{
+    LListConstructor L;
+    LFunctionConstructor F;
+    LFunctionalSymbol<LFunctionFuncall> FUNCALL("FUNCALL");
+    LReference X = FindVar(func);
+    LReference ref = (L| FUNCALL, (F ^ (L| LAMBDA, (L| X), func)), ~value);
+    return ref.Evaluate().GetInt();
+}
+
 //генерация целого с ограничениями по списку
-//TODO сделать генерацию с ограничениями по функции
 int GenIntWithConfine(LReference lx, int a, int b)
 {
 	int r;
 	do{
 		r = GenInt(a, b);
-		LReference x = lx;
-		while(!x.IsEmptyList()){
-			int m = x.Car().GetInt();
-			if(m == r){
-				break;
-			}
-			x = x.Cdr();
-		}
-		if(x.IsEmptyList())
-			break;
-	}while(1);
+	}while(!Confine(r, lx));
 	return r;
 }
 
 //генерация вещественного с ограничениями по списку
-//TODO сделать генерацию с ограничениями по функции
 float GenFloatWithConfine(LReference lx, float a, float b, int min, int max)
 {
 	float r;
 	do{
 		r = GenFloat(a, b, min, max);
-		LReference x = lx;
-		while(!x.IsEmptyList()){
-			float m = x.Car().GetFloat();
-			if(Abs(m - r) < 0.0000001){
-				break;
-			}
-			x = x.Cdr();
-		}
-		if(x.IsEmptyList())
-			break;
-	}while(1);
+	}while(!Confine(r, lx));
 	return r;
 }
 
 //проверка двух чисел на то, что они могут являться рациональной дробью
-//TODO добавить проверку на деление m на n, чтобы дроби не сокращались
-bool CheckNM(int n, int m, float a, float b)
+bool CheckNumDenum(int n, int m)
 {
-	float fn = n;
-	float fm = m;
-	return (n != 0) && (Abs(n) % Abs(m) != 0) && (fn / fm > a) && (fn / fm < b);
+	int mn = Abs(n), mm = Abs(m);
+	return (n != 0) && (m != 0) && (mn % mm != 0);
+}
+
+LReference GenFrac(float a, float b, int den_a, int den_b)
+{
+    int denum = GenInt(den_a, den_b);
+	int num_a = a * denum;
+	int num_b = b * denum;
+	int num;
+
+	do{
+	    num = GenInt(num_a, num_b);
+	}while(!CheckNumDenum(num, denum));
+	LListConstructor L;
+	LReference re = (L| num, denum);
+	return re;
+}
+
+LReference GenFracWithConfine(float a, float b, int den_a, int den_b, LReference conf)
+{
+    LReference frac;
+    do{
+        frac = GenFrac(a, b, den_a, den_b);
+    }while(!ConfineFrac(frac, conf));
+    return frac;
+}
+
+void SeparateFrac(LReference x, int &a, int &b)
+{
+    if (!IsList(x)) {
+        a = x.GetInt();
+        b = 1;
+    } else {
+        a = x.Car().GetInt();
+        b = x.Cdr().Car().GetInt();
+    }
+}
+
+int NOD(int a, int b)
+{
+    int aa = Abs(a), ab = Abs(b);
+    while (aa != ab){
+        if (aa > ab)
+            aa = aa - ab;
+        else
+            ab = ab - aa;
+    }
+    return aa;
+}
+
+LReference FracReduction(LReference x)
+{
+    LListConstructor L;
+    int a, b, nod;
+    SeparateFrac(x, a, b);
+    if (a == 0) {
+        return LReference(0);
+    }
+    nod = NOD(a, b);
+    if (b == nod) {
+        return LReference(a / nod);
+    }
+    return (L| a / nod, b / nod);
+}
+
+LReference MakeFrac(int a, int b)
+{
+    LListConstructor L;
+    LReference res;
+    if (b < 0)
+        res = (L| -a, -b);
+    else
+        res = (L| a, b);
+	return res;
+}
+
+LReference FracSum(LReference x, LReference y)
+{
+    LListConstructor L;
+    int a, b, c, d;
+    SeparateFrac(x, a, b);
+    SeparateFrac(y, c, d);
+    return FracReduction(MakeFrac(a * d + c * b, b * d));
+}
+
+LReference FracDiff(LReference x, LReference y)
+{
+    LListConstructor L;
+    int a, b, c, d;
+    SeparateFrac(x, a, b);
+    SeparateFrac(y, c, d);
+    return FracReduction(MakeFrac(a * d - c * b, b * d));
+}
+
+LReference FracMulti(LReference x, LReference y)
+{
+    LListConstructor L;
+    int a, b, c, d;
+    SeparateFrac(x, a, b);
+    SeparateFrac(y, c, d);
+    return FracReduction(MakeFrac(a * c, b * d));
+}
+
+LReference FracDivision(LReference x, LReference y)
+{
+    LListConstructor L;
+    int a, b, c, d;
+    SeparateFrac(x, a, b);
+    SeparateFrac(y, c, d);
+    return FracReduction(MakeFrac(a * d, b * c));
+}
+
+int FracCmp(LReference x, LReference y)
+{
+    LListConstructor L;
+    int a, b, c, d;
+    LReference xred = FracReduction(x);
+    LReference yred = FracReduction(y);
+    SeparateFrac(xred, a, b);
+    SeparateFrac(yred, c, d);
+
+    if (a == c && b == d) {
+        return 0;
+    } else if (a * d > c * b) {
+        return 1;
+    }
+
+    return -1;
 }
 
 //вычисление выражение с кавычкой
@@ -144,7 +293,7 @@ DoApply(int paramsc, const SReference paramsv[], IntelibContinuation& lf) const
 //GENERATEFLOAT(MIN, MAX, MAX_C_ZN/[MIN_C_ZN, MAX_C_ZN, EXCEPTION])
 class LFunctionGenerateFloat: public SExpressionFunction {
 public:
-    LFunctionGenerateFloat() : SExpressionFunction(3, 5){}
+    LFunctionGenerateFloat() : SExpressionFunction(2, 5){}
     virtual SString TextRepresentation() const;
     void DoApply(int paramsc, const SReference *paramsv, IntelibContinuation &lf) const;
 };
@@ -157,27 +306,39 @@ SString LFunctionGenerateFloat:: TextRepresentation() const
 void LFunctionGenerateFloat::
 DoApply(int paramsc, const SReference paramsv[], IntelibContinuation& lf) const
 {
-	int mx, mn;
-	float r;
+	int mx = 6, mn = 0, conf = 0;
+	float r, a = paramsv[0].GetFloat(), b = paramsv[1].GetFloat();
 	switch(paramsc){
 	case 3:
-		mx = paramsv[2].GetInt();
-		r = GenFloat(paramsv[0].GetFloat(), paramsv[1].GetFloat(), 0, mx);
+	    if(IsList(paramsv[2])) {
+            conf = 2;
+	    } else {
+		    mx = paramsv[2].GetInt();
+		    mn = mx;
+		}
 		break;
 	case 4:
-		mn = paramsv[2].GetInt();
-		mx = paramsv[3].GetInt();
-		r = GenFloat(paramsv[0].GetFloat(), paramsv[1].GetFloat(), mn, mx);
+	    if(IsList(paramsv[3])) {
+	        conf = 3;
+            mx = paramsv[2].GetInt();
+            mn = mx;
+	    } else {
+		    mn = paramsv[2].GetInt();
+		    mx = paramsv[3].GetInt();
+		}
 		break;
 	case 5:
 		mn = paramsv[2].GetInt();
 		mx = paramsv[3].GetInt();
-		r = GenFloatWithConfine(paramsv[4], paramsv[0].GetFloat(),
-			paramsv[1].GetFloat(), mn, mx);
+		conf = 4;
 		break;
 	default: 
 		break;
 	}
+	if (conf)
+        r = GenFloatWithConfine(paramsv[conf], a, b, mn, mx);
+    else
+        r = GenFloat(a, b, mn, mx);
     LReference res(r);
     lf.RegularReturn(res);
 }
@@ -186,7 +347,7 @@ DoApply(int paramsc, const SReference paramsv[], IntelibContinuation& lf) const
 //GENERATFRAC(MIN, MAX, MIN_ZNAM, MAX_ZNAM)
 class LFunctionGenerateFrac: public SExpressionFunction {
 public:
-    LFunctionGenerateFrac() : SExpressionFunction(4, 6){}
+    LFunctionGenerateFrac() : SExpressionFunction(4, 5){}
     virtual SString TextRepresentation() const;
     void DoApply(int paramsc, const SReference *paramsv, IntelibContinuation &lf) const;
 };
@@ -196,37 +357,17 @@ SString LFunctionGenerateFrac:: TextRepresentation() const
     return SString("#<FUNCTION GENERATEFRAC>");
 }
 
-//TODO Evaluate надо заменить: TailReturn или типа того
 void LFunctionGenerateFrac::
 DoApply(int paramsc, const SReference paramsv[], IntelibContinuation& lf) const
 {
-	int m;
-	if(paramsc > 5){
-		m = GenIntWithConfine(paramsv[5], paramsv[2].GetInt(), paramsv[3].GetInt());
+    float a = paramsv[0].GetFloat(), b = paramsv[1].GetFloat();
+    int den_a = paramsv[2].GetInt(), den_b = paramsv[3].GetInt();
+	LReference re;
+	if(paramsc == 5){
+        re = GenFracWithConfine(a, b, den_a, den_b, paramsv[4]);
 	}else{
-		m = GenInt(paramsv[2].GetInt(), paramsv[3].GetInt());
+	    re = GenFrac(a, b, den_a, den_b);
 	}
-	int a = - paramsv[3].GetInt()*paramsv[2].GetInt();
-	int b = paramsv[3].GetInt()*paramsv[2].GetInt();
-	int n = GenInt(a, b);
-	if(paramsc > 4){
-		while(1){
-			n = GenIntWithConfine(paramsv[4], a, b);
-			if(CheckNM(n, m, paramsv[0].GetFloat(), paramsv[1].GetFloat()))
-				break;
-		}
-	}else{
-		while(1){
-			if(CheckNM(n, m, paramsv[0].GetFloat(), paramsv[1].GetFloat()))
-				break;
-			else
-				n = GenInt(a, b);
-		}
-	}
-	LListConstructor L;
-	LFunctionalSymbol<LFunctionQuotient> fq("/");
-	LReference re = (L| fq, n, m);
-//	float res = re.Evaluate().GetFloat();
     lf.RegularReturn(re);
 }
 
@@ -248,7 +389,7 @@ void LFunctionFloatFFrac::
 DoApply(int paramsc, const SReference paramsv[], IntelibContinuation& lf) const
 {
 	try{
-		float f = paramsv[0].Cdr().Car().GetFloat() / paramsv[0].Cdr().Cdr().Car().GetInt();
+		float f = paramsv[0].Car().GetFloat() / paramsv[0].Cdr().Car().GetInt();
 		lf.RegularReturn(f);
 	}catch(...){
 		lf.RegularReturn(paramsv[0]);
@@ -273,7 +414,7 @@ void LFunctionFracNumerator::
 DoApply(int paramsc, const SReference paramsv[], IntelibContinuation& lf) const
 {
 	try{
-		int f = paramsv[0].Cdr().Car().GetInt();
+		int f = paramsv[0].Car().GetInt();
 		lf.RegularReturn(f);
 	}catch(...){
 		lf.RegularReturn(paramsv[0].GetFloat());
@@ -298,25 +439,351 @@ void LFunctionFracDenumerator::
 DoApply(int paramsc, const SReference paramsv[], IntelibContinuation& lf) const
 {
 	try{
-		int f = paramsv[0].Cdr().Cdr().Car().GetInt();
+		int f = paramsv[0].Cdr().Car().GetInt();
 		lf.RegularReturn(f);
 	}catch(...){
 		lf.RegularReturn(paramsv[0].GetFloat());
 	}
 }
 
+//получение дроби из двух целых чисел
+//makefrac
+class LFunctionMakeFrac : public SExpressionFunction {
+public:
+    LFunctionMakeFrac() : SExpressionFunction(2, 2){}
+    virtual SString TextRepresentation() const;
+    void DoApply(int paramsc, const SReference *paramsv, IntelibContinuation &lf) const;
+};
+
+SString LFunctionMakeFrac :: TextRepresentation() const
+{
+    return SString("#<FUNCTION MAKEFRAC>");
+}
+
+void LFunctionMakeFrac::
+DoApply(int paramsc, const SReference paramsv[], IntelibContinuation& lf) const
+{
+	LListConstructor L;
+	int a = paramsv[0].GetInt(),
+	    b = paramsv[1].GetInt();
+    LReference res = MakeFrac(a, b);
+    lf.RegularReturn(res);
+}
+
+//сложение дробей и чисел
+//+ plus
+class LFunctionSum : public SExpressionFunction {
+public:
+    LFunctionSum() : SExpressionFunction(2, 2){}
+    virtual SString TextRepresentation() const;
+    void DoApply(int paramsc, const SReference *paramsv, IntelibContinuation &lf) const;
+};
+
+SString LFunctionSum :: TextRepresentation() const
+{
+    return SString("#<FUNCTION PLUS>");
+}
+
+void LFunctionSum::
+DoApply(int paramsc, const SReference paramsv[], IntelibContinuation& lf) const
+{
+	LReference a = paramsv[0],
+	    b = paramsv[1],
+	    res;
+    if (IsList(a) || IsList(b)) {
+        res = FracSum(a, b);
+    } else {
+        res = a.GetFloat() + b.GetFloat();
+    }
+    lf.RegularReturn(res);
+}
+
+//разность дробей и чисел
+//- minus
+class LFunctionMinus : public SExpressionFunction {
+public:
+    LFunctionMinus() : SExpressionFunction(2, 2){}
+    virtual SString TextRepresentation() const;
+    void DoApply(int paramsc, const SReference *paramsv, IntelibContinuation &lf) const;
+};
+
+SString LFunctionMinus :: TextRepresentation() const
+{
+    return SString("#<FUNCTION MINUS>");
+}
+
+void LFunctionMinus::
+DoApply(int paramsc, const SReference paramsv[], IntelibContinuation& lf) const
+{
+	LReference a = paramsv[0],
+	    b = paramsv[1],
+	    res;
+    if (IsList(a) || IsList(b)) {
+        res = FracDiff(a, b);
+    } else {
+        res = a.GetFloat() - b.GetFloat();
+    }
+    lf.RegularReturn(res);
+}
+
+//умножение дробей и чисел
+//* multi
+class LFunctionMulti : public SExpressionFunction {
+public:
+    LFunctionMulti() : SExpressionFunction(2, 2){}
+    virtual SString TextRepresentation() const;
+    void DoApply(int paramsc, const SReference *paramsv, IntelibContinuation &lf) const;
+};
+
+SString LFunctionMulti :: TextRepresentation() const
+{
+    return SString("#<FUNCTION MULTI>");
+}
+
+void LFunctionMulti::
+DoApply(int paramsc, const SReference paramsv[], IntelibContinuation& lf) const
+{
+	LReference a = paramsv[0],
+	    b = paramsv[1],
+	    res;
+    if (IsList(a) || IsList(b)) {
+        res = FracMulti(a, b);
+    } else {
+        res = a.GetFloat() * b.GetFloat();
+    }
+    lf.RegularReturn(res);
+}
+
+//деление дробей и чисел
+// / division
+class LFunctionDivision : public SExpressionFunction {
+public:
+    LFunctionDivision() : SExpressionFunction(2, 2){}
+    virtual SString TextRepresentation() const;
+    void DoApply(int paramsc, const SReference *paramsv, IntelibContinuation &lf) const;
+};
+
+SString LFunctionDivision :: TextRepresentation() const
+{
+    return SString("#<FUNCTION DIVISION>");
+}
+
+void LFunctionDivision::
+DoApply(int paramsc, const SReference paramsv[], IntelibContinuation& lf) const
+{
+	LReference a = paramsv[0],
+	    b = paramsv[1],
+	    res;
+    if (IsList(a) || IsList(b)) {
+        res = FracDivision(a, b);
+    } else {
+        res = a.GetFloat() / b.GetFloat();
+    }
+    lf.RegularReturn(res);
+}
+
+//сокращение дробей
+// fracreduction
+class LFunctionFracReduction : public SExpressionFunction {
+public:
+    LFunctionFracReduction() : SExpressionFunction(1, 1){}
+    virtual SString TextRepresentation() const;
+    void DoApply(int paramsc, const SReference *paramsv, IntelibContinuation &lf) const;
+};
+
+SString LFunctionFracReduction:: TextRepresentation() const
+{
+    return SString("#<FUNCTION FRUCREDUCTION>");
+}
+
+void LFunctionFracReduction::
+DoApply(int paramsc, const SReference paramsv[], IntelibContinuation& lf) const
+{
+	LReference a = paramsv[0],
+	    res;
+    if (IsList(a)) {
+        res = FracReduction(a);
+    } else {
+        res = a;
+    }
+    lf.RegularReturn(res);
+}
+
+//сравнение дробей и чисел
+// myEqual ==
+class LFunctionMyEqual : public SExpressionFunction {
+public:
+    LFunctionMyEqual() : SExpressionFunction(2, 2){}
+    virtual SString TextRepresentation() const;
+    void DoApply(int paramsc, const SReference *paramsv, IntelibContinuation &lf) const;
+};
+
+SString LFunctionMyEqual :: TextRepresentation() const
+{
+    return SString("#<FUNCTION MYEQUAL>");
+}
+
+void LFunctionMyEqual::
+DoApply(int paramsc, const SReference paramsv[], IntelibContinuation& lf) const
+{
+	LReference a = paramsv[0],
+	    b = paramsv[1],
+	    res;
+    if (IsList(a) || IsList(b)) {
+        res = FracCmp(a, b) == 0;
+    } else {
+        res = Abs(a.GetFloat() - b.GetFloat()) < EPSILON;
+    }
+    lf.RegularReturn(res);
+}
+
+// myNotEqual !=
+class LFunctionMyNotequal : public SExpressionFunction {
+public:
+    LFunctionMyNotequal() : SExpressionFunction(2, 2){}
+    virtual SString TextRepresentation() const;
+    void DoApply(int paramsc, const SReference *paramsv, IntelibContinuation &lf) const;
+};
+
+SString LFunctionMyNotequal :: TextRepresentation() const
+{
+    return SString("#<FUNCTION MYNOTEQUAL>");
+}
+
+void LFunctionMyNotequal::
+DoApply(int paramsc, const SReference paramsv[], IntelibContinuation& lf) const
+{
+	LReference a = paramsv[0],
+	    b = paramsv[1],
+	    res;
+    if (IsList(a) || IsList(b)) {
+        res = FracCmp(a, b) != 0;
+    } else {
+        res = Abs(a.GetFloat() - b.GetFloat()) > EPSILON;
+    }
+    lf.RegularReturn(res);
+}
+
+// mygeq >=
+class LFunctionMyGeq : public SExpressionFunction {
+public:
+    LFunctionMyGeq() : SExpressionFunction(2, 2){}
+    virtual SString TextRepresentation() const;
+    void DoApply(int paramsc, const SReference *paramsv, IntelibContinuation &lf) const;
+};
+
+SString LFunctionMyGeq :: TextRepresentation() const
+{
+    return SString("#<FUNCTION MYGEQ>");
+}
+
+void LFunctionMyGeq::
+DoApply(int paramsc, const SReference paramsv[], IntelibContinuation& lf) const
+{
+	LReference a = paramsv[0],
+	    b = paramsv[1],
+	    res;
+    if (IsList(a) || IsList(b)) {
+        res = FracCmp(a, b) >= 0;
+    } else {
+        res = a.GetFloat() >= b.GetFloat();
+    }
+    lf.RegularReturn(res);
+}
+
+// myleq >=
+class LFunctionMyLeq : public SExpressionFunction {
+public:
+    LFunctionMyLeq() : SExpressionFunction(2, 2){}
+    virtual SString TextRepresentation() const;
+    void DoApply(int paramsc, const SReference *paramsv, IntelibContinuation &lf) const;
+};
+
+SString LFunctionMyLeq :: TextRepresentation() const
+{
+    return SString("#<FUNCTION MYLEQ>");
+}
+
+void LFunctionMyLeq::
+DoApply(int paramsc, const SReference paramsv[], IntelibContinuation& lf) const
+{
+	LReference a = paramsv[0],
+	    b = paramsv[1],
+	    res;
+    if (IsList(a) || IsList(b)) {
+        res = FracCmp(a, b) <= 0;
+    } else {
+        res = a.GetFloat() <= b.GetFloat();
+    }
+    lf.RegularReturn(res);
+}
+
+// mylessp <
+class LFunctionMyLessp : public SExpressionFunction {
+public:
+    LFunctionMyLessp() : SExpressionFunction(2, 2){}
+    virtual SString TextRepresentation() const;
+    void DoApply(int paramsc, const SReference *paramsv, IntelibContinuation &lf) const;
+};
+
+SString LFunctionMyLessp :: TextRepresentation() const
+{
+    return SString("#<FUNCTION MYLESSP>");
+}
+
+void LFunctionMyLessp::
+DoApply(int paramsc, const SReference paramsv[], IntelibContinuation& lf) const
+{
+	LReference a = paramsv[0],
+	    b = paramsv[1],
+	    res;
+    if (IsList(a) || IsList(b)) {
+        res = FracCmp(a, b) < 0;
+    } else {
+        res = a.GetFloat() < b.GetFloat();
+    }
+    lf.RegularReturn(res);
+}
+
+// mygreaterp >
+class LFunctionMyGreaterp : public SExpressionFunction {
+public:
+    LFunctionMyGreaterp() : SExpressionFunction(2, 2){}
+    virtual SString TextRepresentation() const;
+    void DoApply(int paramsc, const SReference *paramsv, IntelibContinuation &lf) const;
+};
+
+SString LFunctionMyGreaterp :: TextRepresentation() const
+{
+    return SString("#<FUNCTION MYGREATERP>");
+}
+
+void LFunctionMyGreaterp::
+DoApply(int paramsc, const SReference paramsv[], IntelibContinuation& lf) const
+{
+	LReference a = paramsv[0],
+	    b = paramsv[1],
+	    res;
+    if (IsList(a) || IsList(b)) {
+        res = FracCmp(a, b) > 0;
+    } else {
+        res = a.GetFloat() > b.GetFloat();
+    }
+    lf.RegularReturn(res);
+}
+
 LExpressionPackage * MakeMyPackage(Table* table)
 {
     LExpressionPackage *p = new LExpressionPackageIntelib;
-    LFunctionalSymbol<LFunctionPlus> s_1("+");
+    LFunctionalSymbol<LFunctionSum> s_1("+");
     p->Import(s_1);
-    LFunctionalSymbol<LFunctionDifference> s_2("-");
+    LFunctionalSymbol<LFunctionMinus> s_2("-");
     p->Import(s_2);
     LFunctionalSymbol<LFunctionDefvar> s_3("=");
     p->Import(s_3);
-    LFunctionalSymbol<LFunctionTimes> s_4("*");
+    LFunctionalSymbol<LFunctionMulti> s_4("*");
     p->Import(s_4);
-    LFunctionalSymbol<LFunctionQuotient> s_5("/");
+    LFunctionalSymbol<LFunctionDivision> s_5("/");
     p->Import(s_5);
     LFunctionalSymbol<LFunctionGenerateFloat> s_6("GENERATEFLOAT");
     p->Import(s_6);
@@ -328,17 +795,17 @@ LExpressionPackage * MakeMyPackage(Table* table)
     p->Import(s_9);
     LFunctionalSymbol<LFunctionIf> s_10("IF");
     p->Import(s_10);
-    LFunctionalSymbol<LFunctionMathequal> s_11("==");
+    LFunctionalSymbol<LFunctionMyEqual> s_11("==");
     p->Import(s_11);
-    LFunctionalSymbol<LFunctionMathnotequal> s_12("!=");
+    LFunctionalSymbol<LFunctionMyNotequal> s_12("!=");
     p->Import(s_12);
-    LFunctionalSymbol<LFunctionMathgeq> s_13(">=");
+    LFunctionalSymbol<LFunctionMyGeq> s_13(">=");
     p->Import(s_13);
-    LFunctionalSymbol<LFunctionMathleq> s_14("<=");
+    LFunctionalSymbol<LFunctionMyLeq> s_14("<=");
     p->Import(s_14);
-    LFunctionalSymbol<LFunctionLessp> s_15("<");
+    LFunctionalSymbol<LFunctionMyLessp> s_15("<");
     p->Import(s_15);
-    LFunctionalSymbol<LFunctionGreaterp> s_16(">");
+    LFunctionalSymbol<LFunctionMyGreaterp> s_16(">");
     p->Import(s_16);
 	LFunctionalSymbol<SFunctionAnd> s_17("AND");
 	p->Import(s_17);
@@ -374,6 +841,12 @@ LExpressionPackage * MakeMyPackage(Table* table)
     p->Import(s_32);
     LFunctionalSymbol<SFunctionTan> s_33("TAN");
     p->Import(s_33);
+    LFunctionalSymbol<LFunctionMakeFrac> s_34("MAKEFRAC");
+    p->Import(s_34);
+    LFunctionalSymbol<LFunctionFuncall> s_35("FUNCALL");
+    p->Import(s_35);
+    LFunctionalSymbol<LFunctionFracReduction> s_36("FRACREDUCTION");
+    p->Import(s_36);
     while(table != NULL){
         LSymbol symb(table->name);
         symb->SetDynamicValue(table->value);
