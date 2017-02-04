@@ -168,6 +168,15 @@ LReference FracSum(LReference x, LReference y)
     return (L| a * d + c * b, b * d);
 }
 
+LReference FracDiff(LReference x, LReference y)
+{
+    LListConstructor L;
+    int a, b, c, d;
+    SeparateFrac(x, a, b);
+    SeparateFrac(y, c, d);
+    return (L| a * d - c * b, b * d);
+}
+
 //вычисление выражение с кавычкой
 static SReference QuoteExpression(const SReference &ref, void *m)
 {
@@ -400,12 +409,40 @@ DoApply(int paramsc, const SReference paramsv[], IntelibContinuation& lf) const
     lf.RegularReturn(res);
 }
 
+//разность дробей и чисел
+//- minus
+class LFunctionMinus : public SExpressionFunction {
+public:
+    LFunctionMinus() : SExpressionFunction(2, 2){}
+    virtual SString TextRepresentation() const;
+    void DoApply(int paramsc, const SReference *paramsv, IntelibContinuation &lf) const;
+};
+
+SString LFunctionMinus :: TextRepresentation() const
+{
+    return SString("#<FUNCTION MINUS>");
+}
+
+void LFunctionMinus::
+DoApply(int paramsc, const SReference paramsv[], IntelibContinuation& lf) const
+{
+	LReference a = paramsv[0],
+	    b = paramsv[1],
+	    res;
+    if (IsList(a) || IsList(b)) {
+        res = FracDiff(a, b);
+    } else {
+        res = a.GetFloat() - b.GetFloat();
+    }
+    lf.RegularReturn(res);
+}
+
 LExpressionPackage * MakeMyPackage(Table* table)
 {
     LExpressionPackage *p = new LExpressionPackageIntelib;
     LFunctionalSymbol<LFunctionSum> s_1("+");
     p->Import(s_1);
-    LFunctionalSymbol<LFunctionDifference> s_2("-");
+    LFunctionalSymbol<LFunctionMinus> s_2("-");
     p->Import(s_2);
     LFunctionalSymbol<LFunctionDefvar> s_3("=");
     p->Import(s_3);

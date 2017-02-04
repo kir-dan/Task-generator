@@ -6,9 +6,9 @@
 
 %%%SOLVE
 
-(= x1 (makefrac 3 2))
-(= x2 (makefrac 1 2))
-(= x (+ 1 2))
+(= x1 (makefrac 2 2))
+(= x2 1)
+(= x (- x1 x2))
 (= a 2)
 (= c 5)
 
