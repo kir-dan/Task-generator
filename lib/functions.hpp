@@ -233,7 +233,7 @@ DoApply(int paramsc, const SReference paramsv[], IntelibContinuation& lf) const
 //TODO переделать определение параметров
 class LFunctionGenerateFloat: public SExpressionFunction {
 public:
-    LFunctionGenerateFloat() : SExpressionFunction(3, 5){}
+    LFunctionGenerateFloat() : SExpressionFunction(2, 5){}
     virtual SString TextRepresentation() const;
     void DoApply(int paramsc, const SReference *paramsv, IntelibContinuation &lf) const;
 };
@@ -249,6 +249,10 @@ DoApply(int paramsc, const SReference paramsv[], IntelibContinuation& lf) const
 	int mx, mn;
 	float r, a = paramsv[0].GetFloat(), b = paramsv[1].GetFloat();
 	switch(paramsc){
+	case 2:
+	    mx = 6;
+        r = GenFloat(a, b, mx);
+        break;
 	case 3:
 		mx = paramsv[2].GetInt();
 		r = GenFloat(a, b, mx);
@@ -511,6 +515,8 @@ DoApply(int paramsc, const SReference paramsv[], IntelibContinuation& lf) const
     lf.RegularReturn(res);
 }
 
+//TODO описать сокращение дробей
+//TODO ограничение для дроби сделать одно
 LExpressionPackage * MakeMyPackage(Table* table)
 {
     LExpressionPackage *p = new LExpressionPackageIntelib;
