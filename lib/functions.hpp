@@ -127,7 +127,7 @@ float GenFloatWithConfine(LReference lx, float a, float b, int min, int max)
 bool CheckNumDenum(int n, int m)
 {
 	int mn = Abs(n), mm = Abs(m);
-	return (n != 0) && (m != 0) && ((mn >= mm) ? mn % mm != 0 : true);
+	return (n != 0) && (m != 0) && (mn % mm != 0);
 }
 
 LReference GenFrac(float a, float b, int den_a, int den_b)
