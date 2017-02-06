@@ -77,23 +77,28 @@ int main(int argc, char** argv)
 			    }
 			    list_curr = list_curr->next;
 			}
-	
-			printf("Print task and answers...\n");
 			//print task and answer
-			printf("***PRINT VARIANTS***\n");
+			printf("Print task %d...\n", i);
 			printAnswer(reader, list_templ, f_var);
-			printf("***PRINT ANSWERS***\n");
+			printf("Print answer %d...\n", i);
 			printAnswer(reader, list_ans, f_ans);
 		}
 		//close files
+        printf("Ends variats file...\n");
 		printEnd(f_var);
+        printf("Ends answer file...\n");
 		printEnd(f_ans);
+        printf("Close variants file...\n");
 		fclose(f_var);
+        printf("Close answer file...\n");
 		fclose(f_ans);
+        printf("Close config file...\n");
 		fclose(f_config);
 
 		//make pdf
+        printf("Making pdf...\n");
 		makePdf();
+		printf("Success!\n");
 	}catch(Error &err){
 		err.what();
     }catch(const IntelibX& ex) {
