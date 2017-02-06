@@ -13,15 +13,10 @@ INSTALLATION ON MAC OS
 ---------------------------------------------
 1) Установить **InteLib**
 
-1.1) В Makefile поменять 37 строку
+1.1) Устновить флаг
 ```
-	ifeq ($(OSTYPE), MinGW-win)
+	USE_READLINE = no
 ```
-На строку
-```
-	ifeq ($(OSTYPE), $(filter $(OSTYPE), MinGW-win darwin16))
-```
-где вместо **darwin16** может стоять другая строка, которая выдается по команде "echo $OSTYPE"
 
 1.2)
 ```
