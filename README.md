@@ -25,7 +25,6 @@ b)
 ```
 	make ; make install
 ```
-
 2. Настроить **pdflatex**
 a) Установить pdflatex
 ```
@@ -40,12 +39,10 @@ d) Установить пакет для margin'a
 ```
 	sudo tlmgr install vmargin
 ```
-
 3. Скачать и собрать проект
 ```
 	make all
 ```
-
 4. Запустить проект
 ```
 	./task-generator [config filename] [number of tasks]
