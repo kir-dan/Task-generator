@@ -164,6 +164,15 @@ void SeparateFrac(LReference x, int &a, int &b)
     }
 }
 
+//модуль -- дроби
+LReference AbsFrac(LReference a)
+{
+    LListConstructor L;
+    int n, m;
+	SeparateFrac(a, n, m);
+	return (L| Abs(n), Abs(m));
+}
+
 int NOD(int a, int b)
 {
     int aa = Abs(a), ab = Abs(b);
@@ -795,6 +804,32 @@ DoApply(int paramsc, const SReference paramsv[], IntelibContinuation& lf) const
     lf.RegularReturn(res);
 }
 
+// модуль от числа
+// abs
+class LFunctionMyAbs : public SExpressionFunction {
+public:
+    LFunctionMyAbs() : SExpressionFunction(1, 1){}
+    virtual SString TextRepresentation() const;
+    void DoApply(int paramsc, const SReference *paramsv, IntelibContinuation &lf) const;
+};
+
+SString LFunctionMyAbs:: TextRepresentation() const
+{
+    return SString("#<FUNCTION ABS>");
+}
+
+void LFunctionMyAbs::
+DoApply(int paramsc, const SReference paramsv[], IntelibContinuation& lf) const
+{
+    LReference res;
+	if (IsList(paramsv[0])) {
+	    res = AbsFrac(paramsv[0]);
+	} else {
+	    res = Abs(paramsv[0].GetFloat());
+	}
+    lf.RegularReturn(res);
+}
+
 LExpressionPackage * MakeMyPackage(Table* table)
 {
     LExpressionPackage *p = new LExpressionPackageIntelib;
@@ -872,6 +907,8 @@ LExpressionPackage * MakeMyPackage(Table* table)
     p->Import(s_36);
     LFunctionalSymbol<LFunctionPow> s_37("POW");
     p->Import(s_37);
+    LFunctionalSymbol<LFunctionAbs> s_38("ABS");
+    p->Import(s_38);
     while(table != NULL){
         LSymbol symb(table->name);
         symb->SetDynamicValue(table->value);
