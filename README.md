@@ -11,7 +11,8 @@ GENERAL USAGE NOTES
 
 INSTALLATION ON MAC OS
 ---------------------------------------------
-1) Установить **InteLib**:
+1) Установить **InteLib**
+
 1.1) В Makefile поменять 37 строку
 ```
 	ifeq ($(OSTYPE), MinGW-win)
@@ -21,17 +22,20 @@ INSTALLATION ON MAC OS
 	ifeq ($(OSTYPE), $(filter $(OSTYPE), MinGW-win darwin16))
 ```
 где вместо **darwin16** может стоять другая строка, которая выдается по команде "echo $OSTYPE"
+
 1.2)
 ```
 	make ; make install
 ```
 
 2) Настроить **pdflatex**
+
 2.1) Установить pdflatex
 ```
 	brew cask install basictex
 ```
 2.2) Перезапустить сессию терминала
+
 2.3) Установить пакеты русского языка
 ```
 	sudo tlmgr install babel-russian hyphen-russian cyrillic t2 lh cm-super
@@ -42,11 +46,13 @@ INSTALLATION ON MAC OS
 ```
 
 3) Скачать и собрать проект
+
 ```
 	make all
 ```
 
 4) Запустить проект
+
 ```
 	./task-generator [config filename] [number of tasks]
 ```
