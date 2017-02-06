@@ -9,9 +9,7 @@ $AC$ и основанием $AD$ равен $%angle$.
 %%%SOLVE
 
 (= Rad (generateint 2 12))
-(= numerator (generateint 1 4))
-(= denominator (+ numerator 1))
-(= angle (makefrac numerator denominator))
+(= angle (generatefrac 0 1 2 5 '(== (numerator x) (- (denumerator x) 1))))
 (= a_1 (/ 1 angle))
 (= a_2 (- a_1 angle))
 (= a_3 (* a_2 Rad))
