@@ -11,8 +11,8 @@ GENERAL USAGE NOTES
 
 INSTALLATION ON MAC OS
 ---------------------------------------------
-1. Установить **InteLib**:
-a) В Makefile поменять 37 строку
+1) Установить **InteLib**:
+1.1) В Makefile поменять 37 строку
 ```
 	ifeq ($(OSTYPE), MinGW-win)
 ```
@@ -21,29 +21,32 @@ a) В Makefile поменять 37 строку
 	ifeq ($(OSTYPE), $(filter $(OSTYPE), MinGW-win darwin16))
 ```
 где вместо **darwin16** может стоять другая строка, которая выдается по команде "echo $OSTYPE"
-b)
+1.2)
 ```
 	make ; make install
 ```
-2. Настроить **pdflatex**
-a) Установить pdflatex
+
+2) Настроить **pdflatex**
+2.1) Установить pdflatex
 ```
 	brew cask install basictex
 ```
-b) Перезапустить сессию терминала
-c) Установить пакеты русского языка
+2.2) Перезапустить сессию терминала
+2.3) Установить пакеты русского языка
 ```
 	sudo tlmgr install babel-russian hyphen-russian cyrillic t2 lh cm-super
 ```
-d) Установить пакет для margin'a
+2.4) Установить пакет для margin'a
 ```
 	sudo tlmgr install vmargin
 ```
-3. Скачать и собрать проект
+
+3) Скачать и собрать проект
 ```
 	make all
 ```
-4. Запустить проект
+
+4) Запустить проект
 ```
 	./task-generator [config filename] [number of tasks]
 ```
