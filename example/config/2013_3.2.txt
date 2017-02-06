@@ -1,8 +1,8 @@
 %%%TEMPLATE
 
 Решите неравенство
-$$ %n \left(1 + %base^{1 - 2x} \right)^{-\frac{1}{2}} -
-\left(%base^{2x} + %base \right)^{\frac{1}{2}}
+$$ %n \left(%base + %base^{1 - 2x} \right)^{-\frac{1}{2}} -
+\left(%base^{2x} + 1 \right)^{\frac{1}{2}}
 \geq %b^{\frac{1}{2}} \cdot %base^{\frac{x}{2}}.$$
 
 %%%ATTRIBUTE
