@@ -1,0 +1,16 @@
+%%%TEMPLATE
+
+Трапеция $ABCD$ вписана в окржность радиуса $R$ и описана около окружности
+радиуса $r$, причем $R = %alpha r$. Найдите среднюю линию трапеции, если
+диагональ $AC$ равна %diag.
+
+%%%ATTRIBUTE
+
+%%%SOLVE
+
+(= diag (generateint 1 5))
+(= alpha (fracreduction (makefrac diag 2)))
+(= answer (+ 1 (* 4 (* alpha alpha))))
+
+%%%ANSWER
+$\sqrt{%answer} - 1$
