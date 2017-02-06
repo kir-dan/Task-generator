@@ -1,0 +1,21 @@
+%%%TEMPLATE
+
+Трапеция $ABCD$ вписана в окржность радиуса $R$ и описана около окружности
+радиуса $r$. Найдите $r$, если $R = %Rad $, а косинус угла между диагональю 
+$AC$ и основанием $AD$ равен $%angle$.
+
+%%%ATTRIBUTE
+
+%%%SOLVE
+
+(= Rad (generateint 2 12))
+(= numerator (generateint 1 4))
+(= denominator (+ numerator 1))
+(= angle (makefrac numerator denominator))
+(= a_1 (/ 1 angle))
+(= a_2 (- a_1 angle))
+(= a_3 (* a_2 Rad))
+(= r (fracreduction a_3))
+
+%%%ANSWER
+$%r$
