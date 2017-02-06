@@ -9,9 +9,46 @@ GENERAL USAGE NOTES
 ```
 - Many information about configuration file and possibilities read in 'lit/text.pdf'
 
-INSTALLATION
+INSTALLATION ON MAC OS
 ---------------------------------------------
-- To begin with you should install InteLib
-- - To install the program type 'make all' in commad line
+1. Установить **InteLib**:
+a) В Makefile поменять 37 строку
+```
+	ifeq ($(OSTYPE), MinGW-win)
+```
+На строку
+```
+	ifeq ($(OSTYPE), $(filter $(OSTYPE), MinGW-win darwin16))
+```
+где вместо **darwin16** может стоять другая строка, которая выдается по команде "echo $OSTYPE"
+b)
+```
+	make ; make install
+```
+
+2. Настроить **pdflatex**
+a) Установить pdflatex
+```
+	brew cask install basictex
+```
+b) Перезапустить сессию терминала
+c) Установить пакеты русского языка
+```
+	sudo tlmgr install babel-russian hyphen-russian cyrillic t2 lh cm-super
+```
+d) Установить пакет для margin'a
+```
+	sudo tlmgr install vmargin
+```
+
+3. Скачать и собрать проект
+```
+	make all
+```
+
+4. Запустить проект
+```
+	./task-generator [config filename] [number of tasks]
+```
 
 For any questions, please contact: markitosha@gmail.com
