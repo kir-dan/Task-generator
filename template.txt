@@ -1,0 +1,12 @@
+%%%TEMPLATE
+
+Трапеция
+
+%%%ATTRIBUTE
+
+%%%SOLVE
+
+(= Rad "\\sqrt{5}")
+
+%%%ANSWER
+$%Rad$

@@ -47,6 +47,8 @@ void printEnd(FILE* fd)
 
 //красивый вывод для чисел
 //TODO написать как работает и уменьшить код
+//TODO оптимизировать переписывание строки
+//TODO найти мусор
 const char * beautynum(IntelibReader &reader, const char* str)
 {
 	bool flt = false;
@@ -69,8 +71,12 @@ const char * beautynum(IntelibReader &reader, const char* str)
 	}
 	if(str[0] == '"'){
 		char *new_str = new char[strlen(str) - 1];
-		for(int i = 0; i < strlen(str) - 2; ++i){
-			new_str[i] = str[i+1];
+		new_str[strlen(new_str) - 1] = '\0';
+		for(int i = 0, offset = 1; i < strlen(str) - offset - 1; ++i) {
+		    if (str[i + offset] == '\\') {
+		        ++offset;
+		    }
+			new_str[i] = str[i + offset];
 		}
 		return new_str;
 	}

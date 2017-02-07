@@ -1,4 +1,5 @@
 #define EPSILON 0.000000000000001
+//TODO упростить коэцциент %*b , [[+ %a * \sqrt{%b}]], sqrt{%a}
 //степень
 int Pow(int a, int b)
 {
