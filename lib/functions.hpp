@@ -395,7 +395,6 @@ void LFunctionSqrtInt::
 DoApply(int paramsc, const SReference paramsv[], IntelibContinuation& lf) const
 {
     double sqrtint = sqrt(paramsv[0].GetInt());
-    printf("%f\n", sqrtint);
     int r = int(sqrtint);
     LReference res(r);
     lf.RegularReturn(res);
