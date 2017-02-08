@@ -354,52 +354,6 @@ DoApply(int paramsc, const SReference paramsv[], IntelibContinuation& lf) const
     lf.RegularReturn(res);
 }
 
-//проверка будет ли число целым после извлечение из под корня
-//issqrtint(num)
-class LFunctionIsSqrtInt : public SExpressionFunction {
-public:
-    LFunctionIsSqrtInt() : SExpressionFunction(1, 1){}
-    virtual SString TextRepresentation() const;
-    void DoApply(int paramsc, const SReference *paramsv, IntelibContinuation &lf) const;
-};
-
-SString LFunctionIsSqrtInt :: TextRepresentation() const
-{
-    return SString("#<FUNCTION ISSQRTINT>");
-}
-
-void LFunctionIsSqrtInt::
-DoApply(int paramsc, const SReference paramsv[], IntelibContinuation& lf) const
-{
-    double sqrtint = sqrt(paramsv[0].GetInt());
-    bool r = sqrtint - int(sqrtint) < EPSILON ? true : false;
-    LReference res(r);
-    lf.RegularReturn(res);
-}
-
-//получение целого числа после извлечения из под корня
-//sqrtint(num)
-class LFunctionSqrtInt : public SExpressionFunction {
-public:
-    LFunctionSqrtInt() : SExpressionFunction(1, 1){}
-    virtual SString TextRepresentation() const;
-    void DoApply(int paramsc, const SReference *paramsv, IntelibContinuation &lf) const;
-};
-
-SString LFunctionSqrtInt :: TextRepresentation() const
-{
-    return SString("#<FUNCTION SQRTINT>");
-}
-
-void LFunctionSqrtInt::
-DoApply(int paramsc, const SReference paramsv[], IntelibContinuation& lf) const
-{
-    double sqrtint = sqrt(paramsv[0].GetInt());
-    int r = int(sqrtint);
-    LReference res(r);
-    lf.RegularReturn(res);
-}
-
 //генерация дроби
 //GENERATFRAC(MIN, MAX, MIN_ZNAM, MAX_ZNAM)
 class LFunctionGenerateFrac: public SExpressionFunction {
@@ -878,6 +832,34 @@ DoApply(int paramsc, const SReference paramsv[], IntelibContinuation& lf) const
     lf.RegularReturn(res);
 }
 
+//проверка является ли число целым
+//isint(num)
+class LFunctionIsInt : public SExpressionFunction {
+public:
+    LFunctionIsInt() : SExpressionFunction(1, 1){}
+    virtual SString TextRepresentation() const;
+    void DoApply(int paramsc, const SReference *paramsv, IntelibContinuation &lf) const;
+};
+
+SString LFunctionIsInt :: TextRepresentation() const
+{
+    return SString("#<FUNCTION ISINT>");
+}
+
+void LFunctionIsInt::
+DoApply(int paramsc, const SReference paramsv[], IntelibContinuation& lf) const
+{
+    int check_int = paramsv[0].GetInt();
+    float check_float = paramsv[0].GetFloat();
+    LReference res;
+    if (check_float - check_int < EPSILON) {
+        res = T;
+    } else {
+        res = NIL;
+    }
+    lf.RegularReturn(res);
+}
+
 LExpressionPackage * MakeMyPackage(Table* table)
 {
     LExpressionPackage *p = new LExpressionPackageIntelib;
@@ -957,10 +939,8 @@ LExpressionPackage * MakeMyPackage(Table* table)
     p->Import(s_37);
     LFunctionalSymbol<LFunctionAbs> s_38("ABS");
     p->Import(s_38);
-    LFunctionalSymbol<LFunctionIsSqrtInt> s_39("ISSQRTINT");
+    LFunctionalSymbol<LFunctionIsInt> s_39("ISINT");
     p->Import(s_39);
-    LFunctionalSymbol<LFunctionSqrtInt> s_40("SQRTINT");
-    p->Import(s_40);
     while(table != NULL){
         LSymbol symb(table->name);
         symb->SetDynamicValue(table->value);

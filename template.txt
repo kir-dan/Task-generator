@@ -6,7 +6,7 @@
 
 %%%SOLVE
 
-(= Rad "\\sqrt{5}")
+(if (isint 5.54) (= a 1) (= a 0))
 
 %%%ANSWER
-$%Rad$
+$%a$
