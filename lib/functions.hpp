@@ -395,6 +395,7 @@ void LFunctionSqrtInt::
 DoApply(int paramsc, const SReference paramsv[], IntelibContinuation& lf) const
 {
     double sqrtint = sqrt(paramsv[0].GetInt());
+    printf("%f\n", sqrtint);
     int r = int(sqrtint);
     LReference res(r);
     lf.RegularReturn(res);
@@ -959,7 +960,7 @@ LExpressionPackage * MakeMyPackage(Table* table)
     p->Import(s_38);
     LFunctionalSymbol<LFunctionIsSqrtInt> s_39("ISSQRTINT");
     p->Import(s_39);
-    LFunctionalSymbol<LFunctionIsSqrtInt> s_40("SQRTINT");
+    LFunctionalSymbol<LFunctionSqrtInt> s_40("SQRTINT");
     p->Import(s_40);
     while(table != NULL){
         LSymbol symb(table->name);
