@@ -1,4 +1,5 @@
 #define EPSILON 0.000000000000001
+#include <math.h>
 //TODO упростить коэцциент %*b , [[+ %a * \sqrt{%b}]], sqrt{%a}
 //степень
 int Pow(int a, int b)
@@ -349,6 +350,52 @@ DoApply(int paramsc, const SReference paramsv[], IntelibContinuation& lf) const
         r = GenFloatWithConfine(paramsv[conf], a, b, mn, mx);
     else
         r = GenFloat(a, b, mn, mx);
+    LReference res(r);
+    lf.RegularReturn(res);
+}
+
+//проверка будет ли число целым после извлечение из под корня
+//issqrtint(num)
+class LFunctionIsSqrtInt : public SExpressionFunction {
+public:
+    LFunctionIsSqrtInt() : SExpressionFunction(1, 1){}
+    virtual SString TextRepresentation() const;
+    void DoApply(int paramsc, const SReference *paramsv, IntelibContinuation &lf) const;
+};
+
+SString LFunctionIsSqrtInt :: TextRepresentation() const
+{
+    return SString("#<FUNCTION ISSQRTINT>");
+}
+
+void LFunctionIsSqrtInt::
+DoApply(int paramsc, const SReference paramsv[], IntelibContinuation& lf) const
+{
+    double sqrtint = sqrt(paramsv[0].GetInt());
+    bool r = sqrtint - int(sqrtint) < EPSILON ? true : false;
+    LReference res(r);
+    lf.RegularReturn(res);
+}
+
+//получение целого числа после извлечения из под корня
+//sqrtint(num)
+class LFunctionSqrtInt : public SExpressionFunction {
+public:
+    LFunctionSqrtInt() : SExpressionFunction(1, 1){}
+    virtual SString TextRepresentation() const;
+    void DoApply(int paramsc, const SReference *paramsv, IntelibContinuation &lf) const;
+};
+
+SString LFunctionSqrtInt :: TextRepresentation() const
+{
+    return SString("#<FUNCTION SQRTINT>");
+}
+
+void LFunctionSqrtInt::
+DoApply(int paramsc, const SReference paramsv[], IntelibContinuation& lf) const
+{
+    double sqrtint = sqrt(paramsv[0].GetInt());
+    int r = int(sqrtint);
     LReference res(r);
     lf.RegularReturn(res);
 }
@@ -910,6 +957,10 @@ LExpressionPackage * MakeMyPackage(Table* table)
     p->Import(s_37);
     LFunctionalSymbol<LFunctionAbs> s_38("ABS");
     p->Import(s_38);
+    LFunctionalSymbol<LFunctionIsSqrtInt> s_39("ISSQRTINT");
+    p->Import(s_39);
+    LFunctionalSymbol<LFunctionIsSqrtInt> s_40("SQRTINT");
+    p->Import(s_40);
     while(table != NULL){
         LSymbol symb(table->name);
         symb->SetDynamicValue(table->value);
