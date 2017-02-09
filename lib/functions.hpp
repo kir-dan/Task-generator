@@ -1,6 +1,7 @@
 #define EPSILON 0.000000000000001
 #include <math.h>
 //TODO упростить коэцциент %*b , [[+ %a * \sqrt{%b}]], sqrt{%a}
+//TODO параметризация строк
 //степень
 int Pow(int a, int b)
 {
